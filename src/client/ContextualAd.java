@@ -21,7 +21,6 @@ public class ContextualAd extends Application {
         scene.getStylesheets().add("client/style.css");
         stage.setScene(scene);
         stage.show();
-        //asd
     }
 
     public static void main(String[] args) {
