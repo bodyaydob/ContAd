@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.image.ImageView?>
+<AnchorPane styleClass="pane" xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="client.UserScreenFXMLController"
+            prefHeight="400.0" prefWidth="600.0">
+    <children>
+        <TextArea styleClass="tf" fx:id="textTA1" layoutX="60.0" layoutY="20.0" prefHeight="30.0" prefWidth="300.0"/>
+        <TextArea styleClass="tf" fx:id="textTA2" layoutX="60.0" layoutY="60.0" prefHeight="30.0" prefWidth="300.0" visible="false"/>
+        <Button styleClass="butt" fx:id="plusButt" layoutX="10.0" layoutY="20.0" prefHeight="30.0" prefWidth="30.0" onAction="#handleAddButton" text="+"/>
+        <Button text="Тест" fx:id="testButt" layoutX="10.0" layoutY="20.0" styleClass="butt" prefWidth="65.0" prefHeight="30.0" onAction="#handleTestButtonAction"/>
+        <Label text="Кол-во анализируемых страниц" styleClass="h2" layoutX="95.0" layoutY="10.0" fx:id="countPagesLabel"/>
+        <ToggleButton onAction="#handleOnePageButtonAction" text="1" prefHeight="30.0" prefWidth="30.0" styleClass="butt" layoutY="30.0" layoutX="95.0" fx:id="onePageButt"/>
+        <ToggleButton onAction="#handleTwoPageButtonAction" text="2" prefHeight="30.0" prefWidth="30.0" styleClass="butt" layoutY="30.0" layoutX="135.0" fx:id="twoPageButt"/>
+        <Button styleClass="butt" fx:id="analysisButt" layoutX="370.0" layoutY="20.0" prefWidth="90.0" prefHeight="20.0" onAction="#handleSubmitButton" text="Анализ"/>
+        <Label styleClass="h1" fx:id="result" layoutY="100.0" layoutX="30.0" text="Результат :"/>
+        <Button fx:id="retryButt" layoutX="430.0" layoutY="100.0" styleClass="retryButt" onAction="#handleRetryButton" prefWidth="30.0" prefHeight="30.0"/>
+        <Button fx:id="helpButt" layoutX="470.0" layoutY="100.0" styleClass="helpButt" onAction="#handleHelpButton" prefWidth="30.0" prefHeight="30.0"/>
+        <Label text="Стоп-слова" styleClass="h2" layoutY="95.0" layoutX="510.0" />
+        <Spinner fx:id="spinnerStopWord" layoutX="510.0" layoutY="110.0" styleClass="spinner" prefHeight="20.0" prefWidth="90.0" />
+        <Label styleClass="h2" fx:id="nameUser" layoutX="475.0" layoutY="20.0" text="Тут должно быть имя"/>
+        <Button styleClass="butt" layoutX="480.0" layoutY="45.0" onAction="#handleLogoutAction" text="Выйти"/>
+        <ImageView styleClass="iv" fx:id="ad" layoutY="140.0" layoutX="50.0" fitHeight="250.0" fitWidth="500.0"/>
+    </children>
+
+</AnchorPane>

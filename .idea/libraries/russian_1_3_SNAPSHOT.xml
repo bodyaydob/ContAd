@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="russian-1.3-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/russian-1.3-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

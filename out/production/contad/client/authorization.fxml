@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane styleClass="pane" fx:id="authAP"  xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="client.AuthorizationFXMLController"
+            prefHeight="450.0" prefWidth="500.0">
+    <children>
+        <Label styleClass="h1" fx:id="title" layoutY="30.0" layoutX="200.0" text="Авторизация"/>
+        <GridPane layoutX="50.0" layoutY="50.0">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="30.0" prefWidth="90.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="70.0" prefWidth="150.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="70.0" prefWidth="150.0"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints vgrow="SOMETIMES" minHeight="25.0" prefHeight="35.0"/>
+                <RowConstraints vgrow="SOMETIMES" minHeight="25.0" prefHeight="35.0"/>
+            </rowConstraints>
+            <children>
+                <Label styleClass="h2" text="Деятельность"/>
+                <ToggleButton styleClass="butt" fx:id="reg" prefHeight="20.0" prefWidth="110.0" text="Регистрация" GridPane.columnIndex="1"/>
+                <ToggleButton styleClass="butt" fx:id="auth" prefHeight="20.0" prefWidth="110.0" text="Авторизация" GridPane.columnIndex="2"/>
+                <Label styleClass="h2" text="Роль" GridPane.rowIndex="1"/>
+                <ToggleButton styleClass="butt" fx:id="user" prefHeight="20.0" prefWidth="110.0" text="Пользователь" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                <ToggleButton styleClass="butt" fx:id="admin" prefHeight="20.0" prefWidth="110.0" text="Администратор" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+            </children>
+        </GridPane>
+        <GridPane layoutX="50.0" layoutY="115.0" fx:id="Fields">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="200.0" prefWidth="260.0"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints vgrow="SOMETIMES" minHeight="25.0" prefHeight="35.0"/>
+                <RowConstraints vgrow="SOMETIMES" minHeight="25.0" prefHeight="35.0"/>
+                <RowConstraints vgrow="SOMETIMES" minHeight="25.0" prefHeight="35.0"/>
+                <RowConstraints vgrow="SOMETIMES" minHeight="25.0" prefHeight="35.0"/>
+                <RowConstraints vgrow="SOMETIMES" minHeight="25.0" prefHeight="35.0"/>
+                <RowConstraints vgrow="SOMETIMES" minHeight="25.0" prefHeight="35.0"/>
+                <RowConstraints vgrow="SOMETIMES" minHeight="25.0" prefHeight="35.0"/>
+                <RowConstraints vgrow="SOMETIMES" minHeight="25.0" prefHeight="35.0"/>
+            </rowConstraints>
+            <children>
+                <Label styleClass="h2" text="Имя пользователя"/>
+                <TextField styleClass="tf" fx:id="userName" prefHeight="30.0" prefWidth="200.0" GridPane.rowIndex="1"/>
+                <Label  styleClass="h2" text="Пароль" GridPane.rowIndex="2"/>
+                <PasswordField styleClass="tf" fx:id="password" prefHeight="30.0" prefWidth="200.0" GridPane.rowIndex="3"/>
+                <Label styleClass="h2" fx:id="nameLabel" text="Имя" GridPane.rowIndex="4"/>
+                <TextField styleClass="tf" fx:id="name" prefHeight="30.0" prefWidth="200.0" GridPane.rowIndex="5"/>
+                <!--Группа пользователей и Секретный вопрос на одном месте в гриде, вместе не отображаются - появляются попеременно-->
+                <Label styleClass="h2" fx:id="userGroupLabel" text="Группа пользователей" GridPane.rowIndex="6"/>
+                <TextField styleClass="tf" fx:id="userGroup" prefHeight="30.0" prefWidth="200.0" GridPane.rowIndex="7"/>
+                <Label styleClass="h2" fx:id="secretQuestLabel" text="Секретный вопрос : фамилия разработчика" GridPane.rowIndex="6"/>
+                <TextField styleClass="tf" fx:id="secretQuest" prefHeight="30.0" prefWidth="200.0" GridPane.rowIndex="7"/>
+            </children>
+        </GridPane>
+        <Button styleClass="butt" fx:id="submit" onAction="#handleSubmitButtonAction" layoutX="329.0" layoutY="150.0" prefWidth="70.0" prefHeight="30.0"/>
+
+    </children>
+
+</AnchorPane>
