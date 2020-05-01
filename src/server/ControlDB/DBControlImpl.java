@@ -13,8 +13,14 @@ import java.util.logging.Logger;
 
 //ПОДКЛЮЧЕНИЕ К БД
 public class DBControlImpl implements DBControl {
+    //атрибуты
+    //----------------------------------------------------------
     Connection connection;
 
+    //реализация методов
+    //----------------------------------------------------------
+
+    //подключение к Postgre
     @Override
     public Connection connectPostgre() throws RemoteException {
         connection = null;
@@ -36,6 +42,7 @@ public class DBControlImpl implements DBControl {
         return connection;
     }
 
+    //подключение к Sqlite
     @Override
     public Connection connectSqlite() throws RemoteException {
         connection = null;
@@ -51,6 +58,7 @@ public class DBControlImpl implements DBControl {
         return connection;
     }
 
+    //закрытие соединения
     @Override
     public void closeConnect(Connection connect) throws RemoteException {
         if (connect != null) {
@@ -63,6 +71,7 @@ public class DBControlImpl implements DBControl {
         }
     }
 
+    //получение списка истории
     @Override
     public ArrayList<History> getHistoryList() throws RemoteException {
         ResultSet resultSet = null;
@@ -101,6 +110,7 @@ public class DBControlImpl implements DBControl {
         return resultList;
     }
 
+    //получение имени пользователя
     @Override
     public String getNameUser(int id) throws RemoteException {
         ResultSet resultRS = null;
@@ -121,6 +131,7 @@ public class DBControlImpl implements DBControl {
         return result;
     }
 
+    //получение списка имен категорий
     @Override
     public ArrayList<String> getCategoriesNameList() throws RemoteException {
         ResultSet resultSet = null;
@@ -143,6 +154,7 @@ public class DBControlImpl implements DBControl {
         return resultList;
     }
 
+    //добавить категорию
     @Override
     public void addCategory(String name) throws RemoteException {
         connection = connectPostgre();
@@ -159,6 +171,7 @@ public class DBControlImpl implements DBControl {
         closeConnect(connection);
     }
 
+    //добавить слово
     @Override
     public void addWord(String word, String catName) throws RemoteException {
         ResultSet result = null;
@@ -185,6 +198,7 @@ public class DBControlImpl implements DBControl {
         closeConnect(connection);
     }
 
+    //добавить рекламное предложение
     @Override
     public void addAd(String path, int priority, String catName) throws RemoteException {
         ResultSet result = null;
@@ -213,6 +227,7 @@ public class DBControlImpl implements DBControl {
         closeConnect(connection);
     }
 
+    //получение списка категорий
     @Override
     public ArrayList<Category> getCategoriesList() throws RemoteException {
         ResultSet resultSet = null;
@@ -237,6 +252,7 @@ public class DBControlImpl implements DBControl {
         return resultList;
     }
 
+    //удалить категорию
     @Override
     public void deleteCategory(int id) throws RemoteException {
         connection = connectPostgre();
@@ -253,6 +269,7 @@ public class DBControlImpl implements DBControl {
         closeConnect(connection);
     }
 
+    //получение списка слов
     @Override
     public ArrayList<Word> getWordsList() throws RemoteException {
         ResultSet resultSet = null;
@@ -282,6 +299,7 @@ public class DBControlImpl implements DBControl {
         return resultList;
     }
 
+    //получение списка рекламных предложений
     @Override
     public ArrayList<Ad> getAdsList() throws RemoteException {
         ResultSet resultSet = null;
@@ -313,6 +331,7 @@ public class DBControlImpl implements DBControl {
         return resultList;
     }
 
+    //удалить слово
     @Override
     public void deleteWord(int id) throws RemoteException {
         connection = connectPostgre();
@@ -329,6 +348,7 @@ public class DBControlImpl implements DBControl {
         closeConnect(connection);
     }
 
+    //удалить рекламу
     @Override
     public void deleteAd(int id) throws RemoteException {
         connection = connectPostgre();
@@ -345,6 +365,7 @@ public class DBControlImpl implements DBControl {
         closeConnect(connection);
     }
 
+    //получение ID авторизующегося пользователя
     @Override
     public ResultSet getAuthUserId(Connection connect, String type, String userName, String password) throws RemoteException, SQLException {
         Statement statement = connect.createStatement();
@@ -356,6 +377,7 @@ public class DBControlImpl implements DBControl {
                                                      "password = '" + password + "'");
     }
 
+    //получение ID группы пользователя
     @Override
     public ResultSet getUserGroupId(Connection connect, String group) throws RemoteException, SQLException {
         Statement statement = connect.createStatement();
@@ -364,6 +386,7 @@ public class DBControlImpl implements DBControl {
                                             "WHERE name = '" + group + "'");
     }
 
+    //получение ID типа пользователя
     @Override
     public ResultSet getUserTypeId(Connection connect, String type) throws RemoteException, SQLException {
         Statement statement = connect.createStatement();
@@ -372,10 +395,75 @@ public class DBControlImpl implements DBControl {
                                             "WHERE upper(name) = '" + type.toUpperCase() + "'");
     }
 
+    //добавление регистрирующегося пользователя
     @Override
     public void insertRegUser(Connection connect, int typeId, int groupId, String username, String password, String name) throws RemoteException, SQLException {
         Statement statement = connect.createStatement();
         statement.executeUpdate("INSERT INTO \"user\" (id_usr_type,id_usr_grp,username,password,name) " +
                                         "VALUES ('" + typeId + "','" + groupId + "','" + username + "','" + password + "','" + name +"')");
+    }
+
+    //получение слова
+    @Override
+    public ResultSet getWord(Connection connect, String lemma) throws RemoteException, SQLException {
+        Statement statement = connect.createStatement();
+        return statement.executeQuery("SELECT * " +
+                                            "FROM words " +
+                                            "WHERE upper(value) = '" + lemma.toUpperCase() + "'");
+    }
+
+    //получение пути к рекламному предложению
+    @Override
+    public ResultSet getPathAd(Connection connect, String catName, int priority) throws RemoteException, SQLException {
+        Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_READ_ONLY);
+        return statement.executeQuery("SELECT path " +
+                                            "FROM ads JOIN " +
+                                                 "categories ON categories.id = ads.id_cat " +
+                                            "WHERE categories.name = '" + catName + "' AND  " +
+                                                  "ads.priority = '" + priority+"'");
+    }
+
+    //добавление записи истории
+    @Override
+    public void insertHistory(Connection connect, int userId, int adId, String url1, String url2) throws RemoteException, SQLException {
+        Statement statement = connect.createStatement();
+        statement.executeUpdate("INSERT INTO history (id_user, id_ad, url) " +
+                                        "VALUES ('"+userId+"','"+adId+"','{\""+url1+"\",\""+url2+"\"}')");
+    }
+
+    //получение ID рекламного предлоежния
+    @Override
+    public ResultSet getAdId(Connection connect, String adPath) throws RemoteException, SQLException {
+        Statement statement = connect.createStatement();
+        return statement.executeQuery("SELECT id " +
+                                            "FROM ads  " +
+                                            "WHERE path = '" + adPath + "'");
+    }
+
+    //получение URL из файла истории браузера
+    @Override
+    public ResultSet getURLFromBrowser(Connection connect) throws RemoteException, SQLException {
+        Statement statement = connection.createStatement ();
+        return statement.executeQuery ("SELECT id," +
+                                                   "url," +
+                                                   "MAX(last_visit_time) " +
+                                                "FROM urls");
+    }
+
+    //получение lowerTerm из файла истории браузера
+    @Override
+    public ResultSet getLowerTermFromBrowser(Connection connect, int id) throws RemoteException, SQLException {
+        Statement statement = connection.createStatement ();
+        return statement.executeQuery("SELECT lower_term " +
+                                            "FROM keyword_search_terms " +
+                                            "WHERE url_id ="+ id);
+    }
+
+    //удалить запись истории из браузера
+    @Override
+    public void deleteBrowserHistory(Connection connect, int id) throws RemoteException, SQLException {
+        Statement statement = connection.createStatement ();
+        statement.executeUpdate("DELETE FROM urls " +
+                                        "WHERE id ="+id);
     }
 }

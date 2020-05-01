@@ -168,7 +168,7 @@ public class UserScreenFXMLController extends FXMLController implements Initiali
                 text += "\n" + doc2.getElementsByTag("p").text() + ' ' + doc2.getElementsByTag("h1").text() + ' ' + doc2.getElementsByTag("h2").text();
         }
         words = analysisService.getLemmas(text, spinnerStopWord.getValue());
-        int[] countWords = analysisService.getWords(words);
+        int[] countWords = analysisService.getCntCatsOfLemm(words);
         analysisService.closeConnectionDB();
         System.out.println("ИСКУССТВО\n" + countWords[0] + " слов");
         System.out.println("\nЭЛЕКТРОНИКА\n" + countWords[1] + " слов");
