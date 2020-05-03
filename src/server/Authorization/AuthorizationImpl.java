@@ -17,7 +17,7 @@ public class AuthorizationImpl implements Authorization {
     //атрибуты
     //----------------------------------------
 
-    Connection connection = null;
+//    Connection connection = null;
     DBControlImpl dbci = new DBControlImpl();
 
     //реализация методов
@@ -70,11 +70,11 @@ public class AuthorizationImpl implements Authorization {
     public int checkAuthorizationInformation(String type, String userName, String password) throws RemoteException,SQLException {
         ResultSet result = null;
         int resultId = 0;
-        connection = dbci.connectPostgre();
+//        connection = dbci.connectPostgre();
 
         try {
             //выполнение запроса
-            result = dbci.getAuthUserId(connection, type, userName, password);
+            result = dbci.getAuthUserId(type, userName, password);
             //result это указатель на первую строку с выборки
             //чтобы вывести данные мы будем использовать
             //метод next() , с помощью которого переходим к следующему элементу
@@ -93,23 +93,23 @@ public class AuthorizationImpl implements Authorization {
     @Override
     public void writeRegistrationInformation(String type, String userName, String password, String name, String group) throws RemoteException {
         ResultSet result = null;
-        connection = dbci.connectPostgre();
+//        connection = dbci.connectPostgre();
         int groupId = 0;
         int typeId = 0;
 
         try {
             //получение ID группы пользователей
-            result = dbci.getUserGroupId(connection, group);
+            result = dbci.getUserGroupId(group);
             while (result.next()) {
                 groupId = result.getInt("id_group");
             }
             //получение ID типа пользователя
-            result = dbci.getUserTypeId(connection, type);
+            result = dbci.getUserTypeId(type);
             while (result.next()) {
                 typeId = result.getInt("id_type");
             }
             //выполнение обновления
-            dbci.insertRegUser(connection, typeId, groupId, userName, password, name);
+            dbci.insertRegUser(typeId, groupId, userName, password, name);
         }
         catch (SQLException e) {
             System.out.println("Ошибочная попытка регистрации...");
@@ -120,6 +120,7 @@ public class AuthorizationImpl implements Authorization {
     //закрытие соединения БД
     @Override
     public void closeConnectionDB() throws RemoteException{
-        dbci.closeConnect(connection);
+//        dbci.closeConnect(connection);
+        //TODO: 2. ИЗ AnalysisImpl (организовать соединение с БД в начале работы метода и закрытие в конце. клиент не должен задумываться о БД.)
     }
 }

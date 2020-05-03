@@ -15,15 +15,22 @@ import java.util.logging.Logger;
 public class DBControlImpl implements DBControl {
     //атрибуты
     //----------------------------------------------------------
-    Connection connection;
+//    Connection connection;
+    Connection connectPostgre;
+    Connection connectSqlite;
 
     //реализация методов
     //----------------------------------------------------------
 
+    //конструкторы
+    public DBControlImpl(){
+        connectPostgre = connectPostgre();
+        connectSqlite = connectSqlite();
+    }
+
     //подключение к Postgre
-    @Override
-    public Connection connectPostgre() throws RemoteException {
-        connection = null;
+    private Connection connectPostgre() {
+        connectPostgre = null;
         String url = "jdbc:postgresql://127.0.0.1:5432/contadv";
         String name = "postgres";
         String password = "1234";
@@ -32,30 +39,29 @@ public class DBControlImpl implements DBControl {
             Class.forName("org.postgresql.Driver");
             System.out.println("\nДрайвер подключен...");
             //Создаём соединение
-            connection = DriverManager.getConnection(url, name, password);
+            connectPostgre = DriverManager.getConnection(url, name, password);
             System.out.println("Соединение с PostgreSQL установлено...");
 
         } catch (Exception ex) {
             //выводим наиболее значимые сообщения
             Logger.getLogger(DBControlImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return connection;
+        return connectPostgre;
     }
 
     //подключение к Sqlite
-    @Override
-    public Connection connectSqlite() throws RemoteException {
-        connection = null;
+    private Connection connectSqlite() {
+        connectSqlite = null;
         try {
             Class.forName("org.sqlite.JDBC");
             System.out.println("\nДрайвер подключен...");
-            connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/1/AppData/Local/Google/Chrome/User Data/Default/History");
+            connectSqlite = DriverManager.getConnection("jdbc:sqlite:C:/Users/1/AppData/Local/Google/Chrome/User Data/Default/History");
             System.out.println("Соединение с SQLite установлено...");
         }
         catch (Exception e){
             e.printStackTrace();
         }
-        return connection;
+        return connectSqlite;
     }
 
     //закрытие соединения
@@ -76,12 +82,12 @@ public class DBControlImpl implements DBControl {
     public ArrayList<History> getHistoryList() throws RemoteException {
         ResultSet resultSet = null;
         ArrayList<History> resultList = new ArrayList<History>();
-        connection = connectPostgre();
-        Statement statement = null;
-        Statement statement1 = null;
+//        connection = connectPostgre();
+//        Statement statement = null;
+//        Statement statement1 = null;
 
         try {
-            statement = connection.createStatement();
+            Statement statement = connectPostgre.createStatement();
             //Выполним запрос
             resultSet = statement.executeQuery("SELECT history.id, " +
                                                            "history.url, " +
@@ -106,7 +112,7 @@ public class DBControlImpl implements DBControl {
         } catch (SQLException e) {
             Logger.getLogger(DBControlImpl.class.getName()).log(Level.SEVERE, null, e);
         }
-        closeConnect(connection);
+//        closeConnect(connection);
         return resultList;
     }
 
@@ -116,9 +122,9 @@ public class DBControlImpl implements DBControl {
         ResultSet resultRS = null;
         String result = null;
         try {
-            connection = connectPostgre();
-            Statement statement = null;
-            statement = connection.createStatement();
+//            connection = connectPostgre();
+//            Statement statement = null;
+            Statement statement = connectPostgre.createStatement();
             resultRS = statement.executeQuery("SELECT name " +
                                                        "FROM users " +
                                                        "WHERE id = '" + id + "'");
@@ -127,7 +133,7 @@ public class DBControlImpl implements DBControl {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        closeConnect(connection);
+//        closeConnect(connection);
         return result;
     }
 
@@ -136,12 +142,12 @@ public class DBControlImpl implements DBControl {
     public ArrayList<String> getCategoriesNameList() throws RemoteException {
         ResultSet resultSet = null;
         ArrayList<String> resultList = new ArrayList<String>();
-        connection = connectPostgre();
-        Statement statement = null;
-        Statement statement1 = null;
+//        connection = connectPostgre();
+//        Statement statement = null;
+//        Statement statement1 = null;
 
         try {
-            statement = connection.createStatement();
+            Statement statement = connectPostgre.createStatement();
             //Выполним запрос
             resultSet = statement.executeQuery("SELECT name " +
                                                         "FROM categories");
@@ -150,37 +156,37 @@ public class DBControlImpl implements DBControl {
         } catch (SQLException e) {
             Logger.getLogger(DBControlImpl.class.getName()).log(Level.SEVERE, null, e);
         }
-        closeConnect(connection);
+//        closeConnect(connection);
         return resultList;
     }
 
     //добавить категорию
     @Override
     public void addCategory(String name) throws RemoteException {
-        connection = connectPostgre();
-        Statement statement = null;
+//        connection = connectPostgre();
+//        Statement statement = null;
 
         try {
-            statement = connection.createStatement();
+            Statement statement = connectPostgre.createStatement();
             //Выполним запрос
             statement.executeUpdate("INSERT INTO categories (name) " +
                                             "VALUES ('" + name + "')");
         } catch (SQLException e) {
             Logger.getLogger(DBControlImpl.class.getName()).log(Level.SEVERE, null, e);
         }
-        closeConnect(connection);
+//        closeConnect(connection);
     }
 
     //добавить слово
     @Override
     public void addWord(String word, String catName) throws RemoteException {
         ResultSet result = null;
-        connection = connectPostgre();
-        Statement statement = null;
+//        connection = connectPostgre();
+//        Statement statement = null;
         int catId = 0;
 
         try {
-            statement = connection.createStatement();
+            Statement statement = connectPostgre.createStatement();
             result = statement.executeQuery("SELECT id " +
                                                      "FROM categories " +
                                                      "WHERE categories.name = '" + catName + "'");
@@ -195,19 +201,19 @@ public class DBControlImpl implements DBControl {
         } catch (SQLException e) {
             Logger.getLogger(DBControlImpl.class.getName()).log(Level.SEVERE, null, e);
         }
-        closeConnect(connection);
+//        closeConnect(connection);
     }
 
     //добавить рекламное предложение
     @Override
     public void addAd(String path, int priority, String catName) throws RemoteException {
         ResultSet result = null;
-        connection = connectPostgre();
-        Statement statement = null;
+//        connection = connectPostgre();
+//        Statement statement = null;
         int catId = 0;
 
         try {
-            statement = connection.createStatement();
+            Statement statement = connectPostgre.createStatement();
             result = statement.executeQuery("SELECT id " +
                                                      "FROM categories " +
                                                      "WHERE categories.name = '" + catName + "'");
@@ -224,7 +230,7 @@ public class DBControlImpl implements DBControl {
         } catch (SQLException e) {
             Logger.getLogger(DBControlImpl.class.getName()).log(Level.SEVERE, null, e);
         }
-        closeConnect(connection);
+//        closeConnect(connection);
     }
 
     //получение списка категорий
@@ -232,10 +238,10 @@ public class DBControlImpl implements DBControl {
     public ArrayList<Category> getCategoriesList() throws RemoteException {
         ResultSet resultSet = null;
         ArrayList<Category> resultList = new ArrayList<Category>();
-        connection = connectPostgre();
-        Statement statement = null;
+//        connection = connectPostgre();
+//        Statement statement = null;
         try {
-            statement = connection.createStatement();
+            Statement statement = connectPostgre.createStatement();
             //Выполним запрос
             resultSet = statement.executeQuery("SELECT * " +
                                                         "FROM categories");
@@ -248,25 +254,25 @@ public class DBControlImpl implements DBControl {
         } catch (SQLException e) {
             Logger.getLogger(DBControlImpl.class.getName()).log(Level.SEVERE, null, e);
         }
-        closeConnect(connection);
+//        closeConnect(connection);
         return resultList;
     }
 
     //удалить категорию
     @Override
     public void deleteCategory(int id) throws RemoteException {
-        connection = connectPostgre();
-        Statement statement = null;
+//        connection = connectPostgre();
+//        Statement statement = null;
 
         try {
-            statement = connection.createStatement();
+            Statement statement = connectPostgre.createStatement();
             //Выполним запрос
             statement.executeUpdate("DELETE FROM categories " +
                                             "WHERE id =" + id);
         } catch (SQLException e) {
             Logger.getLogger(DBControlImpl.class.getName()).log(Level.SEVERE, null, e);
         }
-        closeConnect(connection);
+//        closeConnect(connection);
     }
 
     //получение списка слов
@@ -274,10 +280,10 @@ public class DBControlImpl implements DBControl {
     public ArrayList<Word> getWordsList() throws RemoteException {
         ResultSet resultSet = null;
         ArrayList<Word> resultList = new ArrayList<Word>();
-        connection = connectPostgre();
-        Statement statement = null;
+//        connection = connectPostgre();
+//        Statement statement = null;
         try {
-            statement = connection.createStatement();
+            Statement statement = connectPostgre.createStatement();
             //Выполним запрос
             resultSet = statement.executeQuery("SELECT words.id, " +
                                                            "words.value, " +
@@ -295,7 +301,7 @@ public class DBControlImpl implements DBControl {
         } catch (SQLException e) {
             Logger.getLogger(DBControlImpl.class.getName()).log(Level.SEVERE, null, e);
         }
-        closeConnect(connection);
+//        closeConnect(connection);
         return resultList;
     }
 
@@ -304,10 +310,10 @@ public class DBControlImpl implements DBControl {
     public ArrayList<Ad> getAdsList() throws RemoteException {
         ResultSet resultSet = null;
         ArrayList<Ad> resultList = new ArrayList<Ad>();
-        connection = connectPostgre();
-        Statement statement = null;
+//        connection = connectPostgre();
+//        Statement statement = null;
         try {
-            statement = connection.createStatement();
+            Statement statement = connectPostgre.createStatement();
             //Выполним запрос
             resultSet = statement.executeQuery("SELECT ads.id, " +
                                                            "ads.path, " +
@@ -327,48 +333,48 @@ public class DBControlImpl implements DBControl {
         } catch (SQLException e) {
             Logger.getLogger(DBControlImpl.class.getName()).log(Level.SEVERE, null, e);
         }
-        closeConnect(connection);
+//        closeConnect(connection);
         return resultList;
     }
 
     //удалить слово
     @Override
     public void deleteWord(int id) throws RemoteException {
-        connection = connectPostgre();
-        Statement statement = null;
+//        connection = connectPostgre();
+//        Statement statement = null;
 
         try {
-            statement = connection.createStatement();
+            Statement statement = connectPostgre.createStatement();
             //Выполним запрос
             statement.executeUpdate("DELETE FROM words " +
                                             "WHERE id =" + id);
         } catch (SQLException e) {
             Logger.getLogger(DBControlImpl.class.getName()).log(Level.SEVERE, null, e);
         }
-        closeConnect(connection);
+//        closeConnect(connection);
     }
 
     //удалить рекламу
     @Override
     public void deleteAd(int id) throws RemoteException {
-        connection = connectPostgre();
-        Statement statement = null;
+//        connection = connectPostgre();
+//        Statement statement = null;
 
         try {
-            statement = connection.createStatement();
+            Statement statement = connectPostgre.createStatement();
             //Выполним запрос
             statement.executeUpdate("DELETE FROM ads " +
                                             "WHERE id =" + id);
         } catch (SQLException e) {
             Logger.getLogger(DBControlImpl.class.getName()).log(Level.SEVERE, null, e);
         }
-        closeConnect(connection);
+//        closeConnect(connection);
     }
 
     //получение ID авторизующегося пользователя
     @Override
-    public ResultSet getAuthUserId(Connection connect, String type, String userName, String password) throws RemoteException, SQLException {
-        Statement statement = connect.createStatement();
+    public ResultSet getAuthUserId(String type, String userName, String password) throws RemoteException, SQLException {
+        Statement statement = connectPostgre.createStatement();
         return statement.executeQuery("SELECT id_user " +
                                                "FROM \"user\" JOIN " +
                                                      "user_type ON \"user\".id_usr_type = user_type.id_type " +
@@ -379,8 +385,8 @@ public class DBControlImpl implements DBControl {
 
     //получение ID группы пользователя
     @Override
-    public ResultSet getUserGroupId(Connection connect, String group) throws RemoteException, SQLException {
-        Statement statement = connect.createStatement();
+    public ResultSet getUserGroupId(String group) throws RemoteException, SQLException {
+        Statement statement = connectPostgre.createStatement();
         return statement.executeQuery("SELECT id_group " +
                                             "FROM user_group " +
                                             "WHERE name = '" + group + "'");
@@ -388,8 +394,8 @@ public class DBControlImpl implements DBControl {
 
     //получение ID типа пользователя
     @Override
-    public ResultSet getUserTypeId(Connection connect, String type) throws RemoteException, SQLException {
-        Statement statement = connect.createStatement();
+    public ResultSet getUserTypeId(String type) throws RemoteException, SQLException {
+        Statement statement = connectPostgre.createStatement();
         return statement.executeQuery("SELECT id_type " +
                                             "FROM user_type " +
                                             "WHERE upper(name) = '" + type.toUpperCase() + "'");
@@ -397,16 +403,16 @@ public class DBControlImpl implements DBControl {
 
     //добавление регистрирующегося пользователя
     @Override
-    public void insertRegUser(Connection connect, int typeId, int groupId, String username, String password, String name) throws RemoteException, SQLException {
-        Statement statement = connect.createStatement();
+    public void insertRegUser(int typeId, int groupId, String username, String password, String name) throws RemoteException, SQLException {
+        Statement statement = connectPostgre.createStatement();
         statement.executeUpdate("INSERT INTO \"user\" (id_usr_type,id_usr_grp,username,password,name) " +
                                         "VALUES ('" + typeId + "','" + groupId + "','" + username + "','" + password + "','" + name +"')");
     }
 
     //получение слова
     @Override
-    public ResultSet getWord(Connection connect, String lemma) throws RemoteException, SQLException {
-        Statement statement = connect.createStatement();
+    public ResultSet getWord(String lemma) throws RemoteException, SQLException {
+        Statement statement = connectPostgre.createStatement();
         return statement.executeQuery("SELECT * " +
                                             "FROM words " +
                                             "WHERE upper(value) = '" + lemma.toUpperCase() + "'");
@@ -414,8 +420,8 @@ public class DBControlImpl implements DBControl {
 
     //получение пути к рекламному предложению
     @Override
-    public ResultSet getPathAd(Connection connect, String catName, int priority) throws RemoteException, SQLException {
-        Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_READ_ONLY);
+    public ResultSet getPathAd(String catName, int priority) throws RemoteException, SQLException {
+        Statement statement = connectPostgre.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_READ_ONLY);
         return statement.executeQuery("SELECT path " +
                                             "FROM ads JOIN " +
                                                  "categories ON categories.id = ads.id_cat " +
@@ -425,16 +431,16 @@ public class DBControlImpl implements DBControl {
 
     //добавление записи истории
     @Override
-    public void insertHistory(Connection connect, int userId, int adId, String url1, String url2) throws RemoteException, SQLException {
-        Statement statement = connect.createStatement();
+    public void insertHistory(int userId, int adId, String url1, String url2) throws RemoteException, SQLException {
+        Statement statement = connectPostgre.createStatement();
         statement.executeUpdate("INSERT INTO history (id_user, id_ad, url) " +
                                         "VALUES ('"+userId+"','"+adId+"','{\""+url1+"\",\""+url2+"\"}')");
     }
 
     //получение ID рекламного предлоежния
     @Override
-    public ResultSet getAdId(Connection connect, String adPath) throws RemoteException, SQLException {
-        Statement statement = connect.createStatement();
+    public ResultSet getAdId(String adPath) throws RemoteException, SQLException {
+        Statement statement = connectPostgre.createStatement();
         return statement.executeQuery("SELECT id " +
                                             "FROM ads  " +
                                             "WHERE path = '" + adPath + "'");
@@ -442,8 +448,8 @@ public class DBControlImpl implements DBControl {
 
     //получение URL из файла истории браузера
     @Override
-    public ResultSet getURLFromBrowser(Connection connect) throws RemoteException, SQLException {
-        Statement statement = connection.createStatement ();
+    public ResultSet getURLFromBrowser() throws RemoteException, SQLException {
+        Statement statement = connectSqlite.createStatement ();
         return statement.executeQuery ("SELECT id," +
                                                    "url," +
                                                    "MAX(last_visit_time) " +
@@ -452,8 +458,8 @@ public class DBControlImpl implements DBControl {
 
     //получение lowerTerm из файла истории браузера
     @Override
-    public ResultSet getLowerTermFromBrowser(Connection connect, int id) throws RemoteException, SQLException {
-        Statement statement = connection.createStatement ();
+    public ResultSet getLowerTermFromBrowser(int id) throws RemoteException, SQLException {
+        Statement statement = connectSqlite.createStatement ();
         return statement.executeQuery("SELECT lower_term " +
                                             "FROM keyword_search_terms " +
                                             "WHERE url_id ="+ id);
@@ -461,8 +467,8 @@ public class DBControlImpl implements DBControl {
 
     //удалить запись истории из браузера
     @Override
-    public void deleteBrowserHistory(Connection connect, int id) throws RemoteException, SQLException {
-        Statement statement = connection.createStatement ();
+    public void deleteBrowserHistory(int id) throws RemoteException, SQLException {
+        Statement statement = connectSqlite.createStatement ();
         statement.executeUpdate("DELETE FROM urls " +
                                         "WHERE id ="+id);
     }

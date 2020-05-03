@@ -16,7 +16,7 @@ public class AnalysisImpl implements Analysis {
     //атрибуты
     //----------------------------------------------
 
-    Connection connection;
+//    Connection connection;
     DBControlImpl dbci = new DBControlImpl();
 
     //реализация методов
@@ -56,9 +56,9 @@ public class AnalysisImpl implements Analysis {
         /*for (int i : result)
             i = 0;*/
         ResultSet resultRS = null;
-        connection = dbci.connectPostgre();
+//        connection = dbci.connectPostgre();
         for (String lemma : lemmas) {
-            resultRS = dbci.getWord(connection, lemma);
+            resultRS = dbci.getWord(lemma);
             while (resultRS.next()) {
                 System.out.println(resultRS.getInt("id_cat") + "\n" + resultRS.getString("value"));
                 result[resultRS.getInt("id_cat") - 1]++;
@@ -70,7 +70,8 @@ public class AnalysisImpl implements Analysis {
     //закрытие соединения
     @Override
     public void closeConnectionDB() throws RemoteException {
-        dbci.closeConnect(connection);
+//        dbci.closeConnect(connection);
+//        TODO: 2. организовать соединение с БД в начале работы метода и закрытие в конце. клиент не должен задумываться о БД.
     }
 
     //получение имени пользователя
@@ -131,8 +132,8 @@ public class AnalysisImpl implements Analysis {
             else priority = 3;
         }
         try {
-            connection = dbci.connectPostgre();
-            resultRS = dbci.getPathAd(connection, nameCat, priority);
+//            connection = dbci.connectPostgre();
+            resultRS = dbci.getPathAd(nameCat, priority);
             while (resultRS.next()) {
                 i++;
             }
@@ -151,9 +152,9 @@ public class AnalysisImpl implements Analysis {
     @Override
     public void writeHistory(int userId, int adId, String url1, String url2) throws RemoteException {
         int idAd = 0;
-        connection = dbci.connectPostgre();
+//        connection = dbci.connectPostgre();
         try {
-            dbci.insertHistory(connection, userId, adId, url1, url2);
+            dbci.insertHistory(userId, adId, url1, url2);
         }
         catch (SQLException e) {
             Logger.getLogger(AuthorizationImpl.class.getName()).log(Level.SEVERE, null, e);
@@ -166,8 +167,8 @@ public class AnalysisImpl implements Analysis {
         ResultSet resultRS = null;
         int result = 0;
         try {
-            connection = dbci.connectPostgre();
-            resultRS = dbci.getAdId(connection, adPath);
+//            connection = dbci.connectPostgre();
+            resultRS = dbci.getAdId(adPath);
             while (resultRS.next())
                 result = resultRS.getInt("id");
         } catch (SQLException e) {
@@ -181,7 +182,7 @@ public class AnalysisImpl implements Analysis {
     public Object[] getURLS(int count) throws RemoteException {
         Object[] result = new Object[3];
         result[0] = count;
-        Connection connection = dbci.connectSqlite();
+//        Connection connection = dbci.connectSqlite();
         ResultSet resultSet1 = null;
         ResultSet resultSet2 = null;
         String URL1 = "";
@@ -193,7 +194,7 @@ public class AnalysisImpl implements Analysis {
 
         try
         {
-            resultSet1 = dbci.getURLFromBrowser(connection);
+            resultSet1 = dbci.getURLFromBrowser();
 
             while (resultSet1.next ())
             {
@@ -202,7 +203,7 @@ public class AnalysisImpl implements Analysis {
                 id1 = resultSet1.getInt("id");
             }
             try{
-                resultSet1 = dbci.getLowerTermFromBrowser(connection, id1);
+                resultSet1 = dbci.getLowerTermFromBrowser(id1);
                 while (resultSet1.next()){
                     result[1] += resultSet1.getString("lower_term");
                 }
@@ -211,11 +212,11 @@ public class AnalysisImpl implements Analysis {
                 e.printStackTrace();
             }
             System.out.println(result[1]);
-            dbci.deleteBrowserHistory(connection, id1);
-            connection.close();
+            dbci.deleteBrowserHistory(id1);
+//            connection.close();
             if(count == 2) {
-                connection = dbci.connectSqlite();
-                resultSet2 = dbci.getURLFromBrowser(connection);
+//                connection = dbci.connectSqlite();
+                resultSet2 = dbci.getURLFromBrowser();
 
                 while (resultSet2.next()) {
                     result[2] = resultSet2.getString("url");
@@ -223,7 +224,7 @@ public class AnalysisImpl implements Analysis {
                     id2 = resultSet2.getInt("id");
                 }
                 try {
-                    resultSet2 = dbci.getLowerTermFromBrowser(connection, id2);
+                    resultSet2 = dbci.getLowerTermFromBrowser(id2);
                     while (resultSet2.next()) {
                         result[2] += resultSet2.getString("lower_term");
                     }
@@ -245,7 +246,7 @@ public class AnalysisImpl implements Analysis {
             {
                 resultSet1.close ();
                 resultSet2.close ();
-                dbci.closeConnect(connection);
+//                dbci.closeConnect();
             }
 
             catch (Exception e)
