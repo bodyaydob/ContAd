@@ -139,7 +139,7 @@ public class UserScreenFXMLController extends FXMLController implements Initiali
         nameUser.setText(analysisService.getNameUser(idUserDB));
         retryButt.setDisable(false);
         analysisButt.setDisable(true);
-        analysisService.closeConnectionDB();
+//        analysisService.closeConnectionDB();
         String text = null;
         Document doc1 = null;
         Document doc2 = null;
@@ -169,7 +169,7 @@ public class UserScreenFXMLController extends FXMLController implements Initiali
         }
         words = analysisService.getLemmas(text, spinnerStopWord.getValue());
         int[] countWords = analysisService.getCntCatsOfLemm(words);
-        analysisService.closeConnectionDB();
+//        analysisService.closeConnectionDB();
         System.out.println("ИСКУССТВО\n" + countWords[0] + " слов");
         System.out.println("\nЭЛЕКТРОНИКА\n" + countWords[1] + " слов");
         System.out.println("\nНАУКА\n" + countWords[2] + " слов");
@@ -184,14 +184,14 @@ public class UserScreenFXMLController extends FXMLController implements Initiali
         result.setText(category);
         Class<?> clazz = this.getClass();
         String imagePath = analysisService.getImage(category);
-        analysisService.closeConnectionDB();
+//        analysisService.closeConnectionDB();
         InputStream input = clazz.getResourceAsStream(imagePath);
         Image image = new Image(input);
         ad.setImage(image);
         int adId = analysisService.getAdId(imagePath);
-        analysisService.closeConnectionDB();
+//        analysisService.closeConnectionDB();
         analysisService.writeHistory(idUserDB, adId, url1, url2);
-        analysisService.closeConnectionDB();
+//        analysisService.closeConnectionDB();
 
     }
 
@@ -210,6 +210,8 @@ public class UserScreenFXMLController extends FXMLController implements Initiali
         scene.getStylesheets().add("client/style.css");
         ContextualAd.primaryStage.setScene(scene);
         ContextualAd.primaryStage.setTitle("Окно авторизации");
+
+        analysisService.closeConnections();
 
         children = loader.getController();
         children.setParent(this);

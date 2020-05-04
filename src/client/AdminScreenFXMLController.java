@@ -39,7 +39,7 @@ public class AdminScreenFXMLController extends FXMLController implements Initial
     private FXMLController children;
     private FXMLController parent;
     private int idUserDB;
-    private DBControl service;
+    private DBControl DBConstrolService;
     private boolean firstAction = true;
 
     TableColumn<History, String> userCol;
@@ -104,7 +104,7 @@ public class AdminScreenFXMLController extends FXMLController implements Initial
     public void initialize(URL location, ResourceBundle resources) {
         try {
             Registry registry = LocateRegistry.getRegistry(0);
-            service = (DBControl) registry.lookup("DBControl");
+            DBConstrolService = (DBControl) registry.lookup("DBControl");
         } catch (RemoteException e) {
             Logger.getLogger(AuthorizationFXMLController.class.getName()).log(Level.SEVERE, null, e);
         } catch (NotBoundException e) {
@@ -155,7 +155,7 @@ public class AdminScreenFXMLController extends FXMLController implements Initial
 
     public void handleChoiceBoxAction(ActionEvent event) throws RemoteException {
         if (firstAction) {
-            nameUser.setText(service.getNameUser(idUserDB));
+            nameUser.setText(DBConstrolService.getNameUser(idUserDB));
             firstAction = false;
         }
         if (choice.getValue().equals("...Хочу подумать...")) {
@@ -172,7 +172,7 @@ public class AdminScreenFXMLController extends FXMLController implements Initial
                 fields.setVisible(false);
                 delOKButt.setVisible(false);
                 table.getColumns().addAll(userCol, adCol, url1Col, url2Col);
-                historyList = service.getHistoryList();
+                historyList = DBConstrolService.getHistoryList();
                 table.setItems(FXCollections.observableArrayList(historyList));
                 table.setVisible(true);
 
@@ -202,6 +202,8 @@ public class AdminScreenFXMLController extends FXMLController implements Initial
         ContextualAd.primaryStage.setScene(scene);
         ContextualAd.primaryStage.setTitle("Окно авторизации");
 
+        DBConstrolService.closeConnects();
+
         children = loader.getController();
         children.setParent(this);
         ContextualAd.primaryStage.show();
@@ -228,7 +230,7 @@ public class AdminScreenFXMLController extends FXMLController implements Initial
                 field3.setVisible(true);
                 field1.setText("");
                 field3.setText("");
-                field2.setItems(FXCollections.observableArrayList(service.getCategoriesNameList()));
+                field2.setItems(FXCollections.observableArrayList(DBConstrolService.getCategoriesNameList()));
                 break;
             case "Категории":
                 lbfield1.setVisible(true);
@@ -255,7 +257,7 @@ public class AdminScreenFXMLController extends FXMLController implements Initial
                 field3.setVisible(false);
                 field1.setText("");
                 field3.setText("");
-                field2.setItems(FXCollections.observableArrayList(service.getCategoriesNameList()));
+                field2.setItems(FXCollections.observableArrayList(DBConstrolService.getCategoriesNameList()));
                 break;
             default:
                 lbfield1.setVisible(false);
@@ -278,19 +280,19 @@ public class AdminScreenFXMLController extends FXMLController implements Initial
         switch ((String) choice.getValue()) {
             case "Реклама":
                 table.getColumns().addAll(pathCol,prioCol,categCol);
-                adsList = service.getAdsList();
+                adsList = DBConstrolService.getAdsList();
                 table.setItems(FXCollections.observableArrayList(adsList));
                 table.setVisible(true);
                 break;
             case "Категории":
                 table.getColumns().addAll(nameCol);
-                categoriesList = service.getCategoriesList();
+                categoriesList = DBConstrolService.getCategoriesList();
                 table.setItems(FXCollections.observableArrayList(categoriesList));
                 table.setVisible(true);
                 break;
             case "Словарь лемм":
                 table.getColumns().addAll(valueCol, catCol);
-                wordsList = service.getWordsList();
+                wordsList = DBConstrolService.getWordsList();
                 table.setItems(FXCollections.observableArrayList(wordsList));
                 table.setVisible(true);
                 break;
@@ -303,16 +305,16 @@ public class AdminScreenFXMLController extends FXMLController implements Initial
     public void handleAddOKAction(ActionEvent event) throws RemoteException{
         switch ((String) choice.getValue()) {
             case "Реклама":
-                service.addAd(field1.getText(),Integer.parseInt(field3.getText()), field2.getValue());
+                DBConstrolService.addAd(field1.getText(),Integer.parseInt(field3.getText()), field2.getValue());
                 field1.setText("");
                 field3.setText("");
                 break;
             case "Категории":
-                service.addCategory(field1.getText());
+                DBConstrolService.addCategory(field1.getText());
                 field1.setText("");
                 break;
             case "Словарь лемм":
-                service.addWord(field1.getText(),field2.getValue());
+                DBConstrolService.addWord(field1.getText(),field2.getValue());
                 field1.setText("");
                 break;
             default:
@@ -325,20 +327,20 @@ public class AdminScreenFXMLController extends FXMLController implements Initial
         switch ((String) choice.getValue()) {
             case "Реклама":
                 Ad ad = (Ad) table.getSelectionModel().getSelectedItem();
-                service.deleteAd(ad.getId());
-                adsList = service.getAdsList();
+                DBConstrolService.deleteAd(ad.getId());
+                adsList = DBConstrolService.getAdsList();
                 table.setItems(FXCollections.observableArrayList(adsList));
                 break;
             case "Категории":
                 Category cat = (Category) table.getSelectionModel().getSelectedItem();
-                service.deleteCategory(cat.getId());
-                categoriesList = service.getCategoriesList();
+                DBConstrolService.deleteCategory(cat.getId());
+                categoriesList = DBConstrolService.getCategoriesList();
                 table.setItems(FXCollections.observableArrayList(categoriesList));
                 break;
             case "Словарь лемм":
                 Word word = (Word) table.getSelectionModel().getSelectedItem();
-                service.deleteWord(word.getId());
-                wordsList = service.getWordsList();
+                DBConstrolService.deleteWord(word.getId());
+                wordsList = DBConstrolService.getWordsList();
                 table.setItems(FXCollections.observableArrayList(wordsList));
                 break;
             default:

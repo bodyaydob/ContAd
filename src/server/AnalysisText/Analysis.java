@@ -20,7 +20,7 @@ public interface Analysis extends Remote {
     //получение имени пользователя
     String            getNameUser (int id)                throws RemoteException;
     //закрытие соединения
-    void              closeConnectionDB()                 throws RemoteException;
+//    void              closeConnectionDB()                 throws RemoteException;
     //получение наибоолеевстречающейся категории
     String            getMaxCat(int[] countWords)         throws RemoteException;
     //получение пути до рекламного предложения
@@ -32,4 +32,6 @@ public interface Analysis extends Remote {
                                     int adId,
                                     String url1,
                                     String url2)          throws RemoteException;
+    //закрытие соединений с БД
+    void              closeConnections()                  throws RemoteException;
 }

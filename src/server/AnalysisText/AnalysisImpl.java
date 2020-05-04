@@ -68,11 +68,11 @@ public class AnalysisImpl implements Analysis {
     }
 
     //закрытие соединения
-    @Override
-    public void closeConnectionDB() throws RemoteException {
-//        dbci.closeConnect(connection);
-//        TODO: 2. организовать соединение с БД в начале работы метода и закрытие в конце. клиент не должен задумываться о БД.
-    }
+//    @Override
+//    public void closeConnectionDB() throws RemoteException {
+////        dbci.closeConnect(connection);
+////        TODO: 2. организовать соединение с БД в начале работы метода и закрытие в конце. клиент не должен задумываться о БД.
+//    }
 
     //получение имени пользователя
     @Override
@@ -255,6 +255,12 @@ public class AnalysisImpl implements Analysis {
             }
         }
         return result;
+    }
+
+    //закрытие соединений с БД
+    @Override
+    public void closeConnections() throws RemoteException {
+        dbci.closeConnects();
     }
 }
 

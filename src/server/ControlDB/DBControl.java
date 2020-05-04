@@ -21,7 +21,7 @@ public interface DBControl extends Remote {
     //подключение к Sqlite
     //Connection          connectSqlite()                   throws RemoteException;
     //закрытие соединения
-    void                closeConnect (Connection connect) throws RemoteException;
+    void                closeConnects() throws RemoteException;
     //получение списка истории
     ArrayList<History>  getHistoryList()                  throws RemoteException;
     //получение имени пользователя

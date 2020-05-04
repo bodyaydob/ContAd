@@ -55,7 +55,7 @@ public class DBControlImpl implements DBControl {
         try {
             Class.forName("org.sqlite.JDBC");
             System.out.println("\nДрайвер подключен...");
-            connectSqlite = DriverManager.getConnection("jdbc:sqlite:C:/Users/1/AppData/Local/Google/Chrome/User Data/Default/History");
+            connectSqlite = DriverManager.getConnection("jdbc:sqlite:C:/Users/shlyk/AppData/Local/Google/Chrome/User Data/Default/History");
             System.out.println("Соединение с SQLite установлено...");
         }
         catch (Exception e){
@@ -66,11 +66,19 @@ public class DBControlImpl implements DBControl {
 
     //закрытие соединения
     @Override
-    public void closeConnect(Connection connect) throws RemoteException {
-        if (connect != null) {
+    public void closeConnects() throws RemoteException {
+        if (connectPostgre != null) {
             try {
-                connect.close();
-                System.out.println("Соединение закрыто...");
+                connectPostgre.close();
+                System.out.println("Соединение с Postgre закрыто...");
+            } catch (SQLException ex) {
+                Logger.getLogger(DBControlImpl.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        if (connectSqlite != null) {
+            try {
+                connectSqlite.close();
+                System.out.println("Соединение с Sqlite закрыто...");
             } catch (SQLException ex) {
                 Logger.getLogger(DBControlImpl.class.getName()).log(Level.SEVERE, null, ex);
             }
