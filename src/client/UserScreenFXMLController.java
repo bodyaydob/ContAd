@@ -105,9 +105,12 @@ public class UserScreenFXMLController extends FXMLController implements Initiali
             //подключение к интерфейсу анализа сервера
             Registry registry = LocateRegistry.getRegistry(0);
             analysisService = (Analysis) registry.lookup("Analysis");
+            analysisService.reConnectToDB();
         } catch (RemoteException e) {
             Logger.getLogger(AuthorizationFXMLController.class.getName()).log(Level.SEVERE, null, e);
         } catch (NotBoundException e) {
+            Logger.getLogger(AuthorizationFXMLController.class.getName()).log(Level.SEVERE, null, e);
+        } catch (SQLException e) {
             Logger.getLogger(AuthorizationFXMLController.class.getName()).log(Level.SEVERE, null, e);
         }
         words = new ArrayList<String>();

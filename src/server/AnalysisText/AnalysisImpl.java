@@ -15,9 +15,7 @@ import java.util.logging.Logger;
 public class AnalysisImpl implements Analysis {
     //атрибуты
     //----------------------------------------------
-
-//    Connection connection;
-    DBControlImpl dbci = new DBControlImpl();
+    DBControlImpl dbci = new DBControlImpl(2);
 
     //реализация методов
     //----------------------------------------------
@@ -56,7 +54,6 @@ public class AnalysisImpl implements Analysis {
         /*for (int i : result)
             i = 0;*/
         ResultSet resultRS = null;
-//        connection = dbci.connectPostgre();
         for (String lemma : lemmas) {
             resultRS = dbci.getWord(lemma);
             while (resultRS.next()) {
@@ -66,13 +63,6 @@ public class AnalysisImpl implements Analysis {
         }
         return result;
     }
-
-    //закрытие соединения
-//    @Override
-//    public void closeConnectionDB() throws RemoteException {
-////        dbci.closeConnect(connection);
-////        TODO: 2. организовать соединение с БД в начале работы метода и закрытие в конце. клиент не должен задумываться о БД.
-//    }
 
     //получение имени пользователя
     @Override
@@ -132,7 +122,6 @@ public class AnalysisImpl implements Analysis {
             else priority = 3;
         }
         try {
-//            connection = dbci.connectPostgre();
             resultRS = dbci.getPathAd(nameCat, priority);
             while (resultRS.next()) {
                 i++;
@@ -152,7 +141,6 @@ public class AnalysisImpl implements Analysis {
     @Override
     public void writeHistory(int userId, int adId, String url1, String url2) throws RemoteException {
         int idAd = 0;
-//        connection = dbci.connectPostgre();
         try {
             dbci.insertHistory(userId, adId, url1, url2);
         }
@@ -167,7 +155,6 @@ public class AnalysisImpl implements Analysis {
         ResultSet resultRS = null;
         int result = 0;
         try {
-//            connection = dbci.connectPostgre();
             resultRS = dbci.getAdId(adPath);
             while (resultRS.next())
                 result = resultRS.getInt("id");
@@ -182,7 +169,6 @@ public class AnalysisImpl implements Analysis {
     public Object[] getURLS(int count) throws RemoteException {
         Object[] result = new Object[3];
         result[0] = count;
-//        Connection connection = dbci.connectSqlite();
         ResultSet resultSet1 = null;
         ResultSet resultSet2 = null;
         String URL1 = "";
@@ -213,9 +199,7 @@ public class AnalysisImpl implements Analysis {
             }
             System.out.println(result[1]);
             dbci.deleteBrowserHistory(id1);
-//            connection.close();
             if(count == 2) {
-//                connection = dbci.connectSqlite();
                 resultSet2 = dbci.getURLFromBrowser();
 
                 while (resultSet2.next()) {
@@ -246,7 +230,6 @@ public class AnalysisImpl implements Analysis {
             {
                 resultSet1.close ();
                 resultSet2.close ();
-//                dbci.closeConnect();
             }
 
             catch (Exception e)
@@ -262,6 +245,11 @@ public class AnalysisImpl implements Analysis {
     public void closeConnections() throws RemoteException {
         dbci.closeConnects();
     }
+
+    //переподключение к БД
+    @Override
+    public void reConnectToDB() throws RemoteException, SQLException {
+        dbci.reCreateConnections();
+    }
 }
 
-//TODO: 1. пройтись по обращениям к БД, адаптировать их к новой БД.

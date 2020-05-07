@@ -28,6 +28,8 @@ public interface Authorization extends Remote {
     boolean validationUserGroup (String userGroup)         throws RemoteException;
     //проверка секретного вопроса
     boolean checkSecretQuest (String answer)               throws RemoteException;
-    //закрытие соединения с БД
-    void    closeConnectionDB()                            throws RemoteException;
+    //закрытие соединений с БД
+    void    closeConnections()                             throws RemoteException;
+    //переподключение к БД
+    void    reConnectToDB()                                throws RemoteException, SQLException;
 }

@@ -23,6 +23,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -105,9 +106,12 @@ public class AdminScreenFXMLController extends FXMLController implements Initial
         try {
             Registry registry = LocateRegistry.getRegistry(0);
             DBConstrolService = (DBControl) registry.lookup("DBControl");
+            DBConstrolService.reCreateConnections();
         } catch (RemoteException e) {
             Logger.getLogger(AuthorizationFXMLController.class.getName()).log(Level.SEVERE, null, e);
         } catch (NotBoundException e) {
+            Logger.getLogger(AuthorizationFXMLController.class.getName()).log(Level.SEVERE, null, e);
+        } catch (SQLException e) {
             Logger.getLogger(AuthorizationFXMLController.class.getName()).log(Level.SEVERE, null, e);
         }
         initNodes();

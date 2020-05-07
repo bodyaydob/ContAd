@@ -109,11 +109,14 @@ public class AuthorizationFXMLController extends FXMLController implements Initi
             //подключение к интерфейсу авторизации сервера
             Registry registry1 = LocateRegistry.getRegistry(0);
             authService = (Authorization) registry1.lookup("Authorization");
+            authService.reConnectToDB();
         }
         catch (RemoteException e) {
             Logger.getLogger(AuthorizationFXMLController.class.getName()).log(Level.SEVERE, null, e);
         }
         catch (NotBoundException e) {
+            Logger.getLogger(AuthorizationFXMLController.class.getName()).log(Level.SEVERE, null, e);
+        } catch (SQLException e) {
             Logger.getLogger(AuthorizationFXMLController.class.getName()).log(Level.SEVERE, null, e);
         }
         initNodes();
@@ -243,7 +246,7 @@ public class AuthorizationFXMLController extends FXMLController implements Initi
                 idUserDB = authService.checkAuthorizationInformation("user",userName.getText(),password.getText());
                 if(idUserDB!=0) {
                     //успешно
-                    authService.closeConnectionDB();
+//                    authService.closeConnectionDB();
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
                     alert.setTitle("Информация");
                     alert.setContentText("Авторизация пользователя прошла успешно!");
@@ -260,7 +263,7 @@ public class AuthorizationFXMLController extends FXMLController implements Initi
             if(reg.isSelected() && validationFlag){
                 //регистрация
                 authService.writeRegistrationInformation("user",userName.getText(),password.getText(),name.getText(),userGroup.getText());
-                authService.closeConnectionDB();
+//                authService.closeConnectionDB();
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Информация");
                 alert.setContentText("Регистрация пользователя прошла успешно!");
@@ -284,7 +287,7 @@ public class AuthorizationFXMLController extends FXMLController implements Initi
                 //if(service1.checkAuthorizationInformation("admin",userName.getText(),password.getText())) {
                 if(idUserDB!=0){
                     //успешно
-                    authService.closeConnectionDB();
+//                    authService.closeConnectionDB();
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
                     alert.setTitle("Информация");
                     alert.setContentText("Авторизация администратора прошла успешно!");
@@ -301,7 +304,7 @@ public class AuthorizationFXMLController extends FXMLController implements Initi
             if(reg.isSelected() && validationFlag){
                 //регистрация
                 authService.writeRegistrationInformation("admin",userName.getText(),password.getText(),name.getText(),"admins");
-                authService.closeConnectionDB();
+//                authService.closeConnectionDB();
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Информация");
                 alert.setContentText("Регистрация администратора прошла успешно!");
@@ -324,6 +327,8 @@ public class AuthorizationFXMLController extends FXMLController implements Initi
         ContextualAd.primaryStage.setScene(scene);
         ContextualAd.primaryStage.setTitle("Окно работы пользователя");
 
+        authService.closeConnections();
+
         children = loader.getController();
         children.setParent(this);
         children.setId(id);
@@ -338,6 +343,8 @@ public class AuthorizationFXMLController extends FXMLController implements Initi
         scene.getStylesheets().add("client/style.css");
         ContextualAd.primaryStage.setScene(scene);
         ContextualAd.primaryStage.setTitle("Окно работы администратора");
+
+        authService.closeConnections();
 
         children = loader.getController();
         children.setParent(this);

@@ -16,10 +16,6 @@ public interface DBControl extends Remote {
     //объявление методов
     //----------------------------------------
 
-    //подключение к Postgre
-    //Connection          connectPostgre()                  throws RemoteException;
-    //подключение к Sqlite
-    //Connection          connectSqlite()                   throws RemoteException;
     //закрытие соединения
     void                closeConnects() throws RemoteException;
     //получение списка истории
@@ -81,4 +77,6 @@ public interface DBControl extends Remote {
     void                deleteAd(int id)                  throws RemoteException;
     //удалить запись истории из браузера
     void                deleteBrowserHistory(int id)      throws RemoteException, SQLException;
+    //пересоздание подключений
+    void                reCreateConnections()             throws RemoteException, SQLException;
 }

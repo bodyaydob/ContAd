@@ -17,8 +17,7 @@ public class AuthorizationImpl implements Authorization {
     //атрибуты
     //----------------------------------------
 
-//    Connection connection = null;
-    DBControlImpl dbci = new DBControlImpl();
+    DBControlImpl dbci = new DBControlImpl(1);
 
     //реализация методов
     //-----------------------------------------
@@ -70,8 +69,6 @@ public class AuthorizationImpl implements Authorization {
     public int checkAuthorizationInformation(String type, String userName, String password) throws RemoteException,SQLException {
         ResultSet result = null;
         int resultId = 0;
-//        connection = dbci.connectPostgre();
-
         try {
             //выполнение запроса
             result = dbci.getAuthUserId(type, userName, password);
@@ -93,7 +90,6 @@ public class AuthorizationImpl implements Authorization {
     @Override
     public void writeRegistrationInformation(String type, String userName, String password, String name, String group) throws RemoteException {
         ResultSet result = null;
-//        connection = dbci.connectPostgre();
         int groupId = 0;
         int typeId = 0;
 
@@ -117,10 +113,15 @@ public class AuthorizationImpl implements Authorization {
         }
     }
 
-    //закрытие соединения БД
+    //закрытие соединений
     @Override
-    public void closeConnectionDB() throws RemoteException{
-//        dbci.closeConnect(connection);
-        //TODO: 2. ИЗ AnalysisImpl (организовать соединение с БД в начале работы метода и закрытие в конце. клиент не должен задумываться о БД.)
+    public void closeConnections() throws RemoteException {
+        dbci.closeConnects();
+    }
+
+    //переподключение к БД
+    @Override
+    public void reConnectToDB() throws RemoteException, SQLException {
+        dbci.reCreateConnections();
     }
 }
