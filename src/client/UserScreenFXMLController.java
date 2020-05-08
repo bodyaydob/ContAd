@@ -139,10 +139,11 @@ public class UserScreenFXMLController extends FXMLController implements Initiali
 
     //обработка нажатия на кнопку "Анализ"
     public void handleSubmitButton(ActionEvent event) throws RemoteException, SQLException {
+        //задание надписи имени пользователя
         nameUser.setText(analysisService.getNameUser(idUserDB));
+        //задание начальных свойств
         retryButt.setDisable(false);
         analysisButt.setDisable(true);
-//        analysisService.closeConnectionDB();
         String text = null;
         Document doc1 = null;
         Document doc2 = null;
@@ -153,26 +154,31 @@ public class UserScreenFXMLController extends FXMLController implements Initiali
                 url2 = textTA2.getText();
         }
         else {
+            //получение последних ссылок на веб-страницы
             Object[] urls = analysisService.getURLS(2);
             url1 = urls[1].toString();
             if (countPages == 2)
                 url2 = urls[2].toString();
         }
         try {
+            //выгрузка содержимого веб-страниц
             doc1 = Jsoup.connect(url1).get();
             if (countPages == 2)
                 doc2 = Jsoup.connect(url2).get();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        //получение текста из выгруженных документов
         if (doc1 != null) {
             text = doc1.getElementsByTag("p").text() + ' ' + doc1.getElementsByTag("h1").text() + ' ' + doc1.getElementsByTag("h2").text();
             if (countPages == 2)
                 text += "\n" + doc2.getElementsByTag("p").text() + ' ' + doc2.getElementsByTag("h1").text() + ' ' + doc2.getElementsByTag("h2").text();
         }
+        //парсинг полученного текста, получение списка лемм
         words = analysisService.getLemmas(text, spinnerStopWord.getValue());
+        //получение кол-ва слов по категориям
         int[] countWords = analysisService.getCntCatsOfLemm(words);
-//        analysisService.closeConnectionDB();
+        //логирование кол-ва слов по категориям
         System.out.println("ИСКУССТВО\n" + countWords[0] + " слов");
         System.out.println("\nЭЛЕКТРОНИКА\n" + countWords[1] + " слов");
         System.out.println("\nНАУКА\n" + countWords[2] + " слов");
@@ -182,24 +188,24 @@ public class UserScreenFXMLController extends FXMLController implements Initiali
         System.out.println("\nРЕЛИГИЯ\n" + countWords[6] + " слов");
         System.out.println("\nМАРКЕТИНГ\n" + countWords[7] + " слов");
         System.out.println("\nМЕДИЦИНА\n" + countWords[8] + " слов");
-        //вычисление максимума
+        //вычисление "главной" категории
         String category = analysisService.getMaxCat(countWords);
         result.setText(category);
+        //получение изображения КР
         Class<?> clazz = this.getClass();
         String imagePath = analysisService.getImage(category);
-//        analysisService.closeConnectionDB();
         InputStream input = clazz.getResourceAsStream(imagePath);
         Image image = new Image(input);
+        //вывод изображения КР
         ad.setImage(image);
         int adId = analysisService.getAdId(imagePath);
-//        analysisService.closeConnectionDB();
+        //запись истории
         analysisService.writeHistory(idUserDB, adId, url1, url2);
-//        analysisService.closeConnectionDB();
-
     }
 
     //обработка нажатия на кнопку "+"
     public void handleAddButton(ActionEvent event) {
+        //кол-во обрабатываемых веб-страниц увеличивается до 2ух
         textTA2.setVisible(true);
         countPages = 2;
         plusButt.setDisable(true);
@@ -223,6 +229,7 @@ public class UserScreenFXMLController extends FXMLController implements Initiali
 
     //обработка нажатия на кнопку "Тест"
     public void handleTestButtonAction(ActionEvent event) {
+        //отображение полей для ввода веб-страниц
         onePageButt.setVisible(false);
         twoPageButt.setVisible(false);
         countPagesLabel.setVisible(false);

@@ -380,8 +380,8 @@ public class DBControlImpl implements DBControl {
         Statement statement = connectPostgre.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_READ_ONLY);
         return statement.executeQuery("SELECT path " +
                                             "FROM ad JOIN " +
-                                                 "category ON category.id_cat = ads.id_cat " +
-                                            "WHERE category.name = '" + catName + "' AND  " +
+                                                 "category ON category.id_cat = ad.id_cat " +
+                                            "WHERE category.name = '" + catName.toUpperCase() + "' AND  " +
                                                   "ad.priority = '" + priority+"'");
     }
 
