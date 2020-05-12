@@ -1,14 +1,10 @@
 package server.Authorization;
 
 import server.ControlDB.DBControlImpl;
-import sun.awt.geom.AreaOp;
 
-import java.net.SocketTimeoutException;
 import java.rmi.RemoteException;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -95,7 +91,7 @@ public class AuthorizationImpl implements Authorization {
 
         try {
             //получение ID группы пользователей
-            result = dbci.getUserGroupId(group);
+            result = dbci.getUserGroupIDByName(group);
             while (result.next()) {
                 groupId = result.getInt("id_group");
             }

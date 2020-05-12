@@ -256,14 +256,14 @@ public class DBControlImpl implements DBControl {
             Statement statement = connectPostgre.createStatement();
             //Выполним запрос
             resultSet = statement.executeQuery("SELECT id_wrd, " +
-                                                           "word.name, " +
-                                                           "category.name " +
+                                                           "word.name AS wrd_name, " +
+                                                           "category.name AS cat_name " +
                                                         "FROM word JOIN " +
                                                              "category ON word.id_cat = category.id_cat");
             while (resultSet.next()) {
                 int id = resultSet.getInt("id_wrd");
-                String value = resultSet.getString("word.name");
-                String cat = resultSet.getString("category.name"); //TODO: 2. возможна ошибка с определением имен
+                String value = resultSet.getString("wrd_name");
+                String cat = resultSet.getString("cat_name");
                 Word word = new Word(id, value, cat);
                 resultList.add(word);
             }
@@ -341,7 +341,7 @@ public class DBControlImpl implements DBControl {
 
     //получение ID группы пользователя
     @Override
-    public ResultSet getUserGroupId(String group) throws RemoteException, SQLException {
+    public ResultSet getUserGroupIDByName(String group) throws RemoteException, SQLException {
         Statement statement = connectPostgre.createStatement();
         return statement.executeQuery("SELECT id_group " +
                                             "FROM user_group " +
@@ -381,22 +381,17 @@ public class DBControlImpl implements DBControl {
         return statement.executeQuery("SELECT path " +
                                             "FROM ad JOIN " +
                                                  "category ON category.id_cat = ad.id_cat " +
-                                            "WHERE category.name = '" + catName.toUpperCase() + "' AND  " +
+                                            "WHERE upper(category.name) = '" + catName.toUpperCase() + "' AND  " +
                                                   "ad.priority = '" + priority+"'");
     }
 
     //добавление записи истории
     @Override
-    public void insertHistory(int userId, int adId, String url1, String url2) throws RemoteException, SQLException {
-        int grpId = 0;
+    public void insertHistory(int userId, int adId, String url1, String url2, int rate, boolean click) throws RemoteException, SQLException {
         Statement statement = connectPostgre.createStatement();
-        ResultSet resultSet = statement.executeQuery("SELECT id_usr_grp " +
-                                                            "FROM user " +
-                                                            "WHERE id_usr = " + userId);
-        while (resultSet.next())
-            grpId = resultSet.getInt("id_usr_grp");
-        statement.executeUpdate("INSERT INTO history (id_user, id_ad, url, id_usr_grp) " +
-                                        "VALUES ('" +userId + "','" + adId + "','{\"" + url1 + "\",\"" + url2 + "\"}','" + grpId + "')");
+        int grpId = getUserGroupIDByUser(userId);
+        statement.executeUpdate("INSERT INTO history (id_user, id_ad, url, id_usr_grp, rate, click) " +
+                                        "VALUES (" +userId + "," + adId + ",'{\"" + url1 + "\",\"" + url2 + "\"}'," + grpId + "," + rate + ", '" + click + "')");
     }
 
     //получение ID рекламного предлоежния
@@ -436,15 +431,15 @@ public class DBControlImpl implements DBControl {
     }
 
     //получение ID категории
-    private int getCatId(String catName){
+    public int getCatId(String catName){
         int catId = 0;
         try {
             Statement statement = connectPostgre.createStatement();
-            ResultSet result = statement.executeQuery("SELECT id " +
-                                                            "FROM categories " +
-                                                            "WHERE categories.name = '" + catName + "'");
+            ResultSet result = statement.executeQuery("SELECT id_cat " +
+                                                            "FROM category " +
+                                                            "WHERE category.name = '" + catName + "'");
             while (result.next())
-                catId = result.getInt("id");
+                catId = result.getInt("id_cat");
         } catch (SQLException e) {
             Logger.getLogger(DBControlImpl.class.getName()).log(Level.SEVERE, null, e);
         }
@@ -460,5 +455,45 @@ public class DBControlImpl implements DBControl {
         if(connectSqlite != null && connectSqlite.isClosed() == true){
             connectSqlite = connectSqlite();
         }
+    }
+
+    //получение ID группы пользователей по ID пользователя
+    @Override
+    public int getUserGroupIDByUser(int userID) throws RemoteException, SQLException {
+        int usrGrpID = 0;
+        Statement statement = connectPostgre.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT id_usr_grp " +
+                                                            "FROM \"user\" " +
+                                                            "WHERE id_user = " + userID);
+        while (resultSet.next())
+            usrGrpID = resultSet.getInt("id_usr_grp");
+        return usrGrpID;
+    }
+
+    //получение групповой информации для пользователя по категории
+    @Override
+    public int getGrpCatData(int groupID, int catID) throws RemoteException, SQLException {
+        int cntWords = 0;
+        Statement statement = connectPostgre.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT cnt_wrds " +
+                                                            "FROM group_cat_data " +
+                                                            "WHERE id_group = " + groupID + " AND " +
+                                                                  "id_cat = " + catID);
+        while (resultSet.next())
+            cntWords = resultSet.getInt("cnt_wrds");
+        return cntWords;
+    }
+
+    //добавление групповой информации для пользователя по категории
+    @Override
+    public void addGrpCatData(int groupID, int catID, int cnt) throws RemoteException, SQLException{
+        Statement statement = connectPostgre.createStatement();
+        statement.executeUpdate("INSERT INTO group_cat_data (id_group, " +
+                                                                "id_cat, " +
+                                                                "cnt_wrds) " +
+                                        "VALUES (" + groupID + ", " + catID + ", " + cnt  + ") " +
+                                        "ON CONFLICT (id_group, id_cat) " +
+                                        "DO UPDATE " +
+                                            "SET cnt_wrds = " + cnt);
     }
 }

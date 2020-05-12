@@ -57,7 +57,7 @@ public class AnalysisImpl implements Analysis {
         for (String lemma : lemmas) {
             resultRS = dbci.getWord(lemma);
             while (resultRS.next()) {
-                System.out.println(resultRS.getInt("id_cat") + "\n" + resultRS.getString("value"));
+                System.out.println(resultRS.getInt("id_cat") + "\n" + resultRS.getString("name"));
                 result[resultRS.getInt("id_cat") - 1]++;
             }
         }
@@ -139,10 +139,10 @@ public class AnalysisImpl implements Analysis {
 
     //запись истории
     @Override
-    public void writeHistory(int userId, int adId, String url1, String url2) throws RemoteException {
+    public void writeHistory(int userId, int adId, String url1, String url2, int rate, boolean click) throws RemoteException {
         int idAd = 0;
         try {
-            dbci.insertHistory(userId, adId, url1, url2);
+            dbci.insertHistory(userId, adId, url1, url2, rate, click);
         }
         catch (SQLException e) {
             Logger.getLogger(AuthorizationImpl.class.getName()).log(Level.SEVERE, null, e);
@@ -157,7 +157,7 @@ public class AnalysisImpl implements Analysis {
         try {
             resultRS = dbci.getAdId(adPath);
             while (resultRS.next())
-                result = resultRS.getInt("id");
+                result = resultRS.getInt("id_ad");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -188,15 +188,15 @@ public class AnalysisImpl implements Analysis {
                 result[1] += " ";
                 id1 = resultSet1.getInt("id");
             }
-            try{
-                resultSet1 = dbci.getLowerTermFromBrowser(id1);
-                while (resultSet1.next()){
-                    result[1] += resultSet1.getString("lower_term");
-                }
-            }
-            catch (Exception e){
-                e.printStackTrace();
-            }
+//            try{
+//                resultSet1 = dbci.getLowerTermFromBrowser(id1);
+//                while (resultSet1.next()){
+//                    result[1] += resultSet1.getString("lower_term");
+//                }
+//            }
+//            catch (Exception e){
+//                e.printStackTrace();
+//            }
             System.out.println(result[1]);
             dbci.deleteBrowserHistory(id1);
             if(count == 2) {
@@ -207,14 +207,14 @@ public class AnalysisImpl implements Analysis {
                     result[2] +=" ";
                     id2 = resultSet2.getInt("id");
                 }
-                try {
-                    resultSet2 = dbci.getLowerTermFromBrowser(id2);
-                    while (resultSet2.next()) {
-                        result[2] += resultSet2.getString("lower_term");
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    resultSet2 = dbci.getLowerTermFromBrowser(id2);
+//                    while (resultSet2.next()) {
+//                        result[2] += resultSet2.getString("lower_term");
+//                    }
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
                 System.out.println(result[2]);
             }
         }
@@ -250,6 +250,23 @@ public class AnalysisImpl implements Analysis {
     @Override
     public void reConnectToDB() throws RemoteException, SQLException {
         dbci.reCreateConnections();
+    }
+
+    //добавление групповых данных по категориям в БД
+    @Override
+    public int[] addGroupsCatDataToDB(int idUser, int[] catData) throws RemoteException, SQLException{
+        //получение ID группы пользователей
+        int usrGrp = dbci.getUserGroupIDByUser(idUser);
+        int catID = 1;
+        int oldCatData = 0;
+        for(int cntWrd : catData){
+            oldCatData = dbci.getGrpCatData(usrGrp, catID);
+            cntWrd += oldCatData;
+            dbci.addGrpCatData(usrGrp, catID, cntWrd);
+            catData[catID-1] = cntWrd;
+            catID++;
+        }
+        return catData;
     }
 }
 

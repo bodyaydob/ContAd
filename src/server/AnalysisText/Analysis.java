@@ -29,9 +29,14 @@ public interface Analysis extends Remote {
     void              writeHistory (int userId,
                                     int adId,
                                     String url1,
-                                    String url2)                 throws RemoteException;
+                                    String url2,
+                                    int rate,
+                                    boolean click)               throws RemoteException;
     //закрытие соединений с БД
     void              closeConnections()                         throws RemoteException;
     //переподключение к БД
     void              reConnectToDB()                            throws RemoteException, SQLException;
+    //добавление групповых данных по категориям в БД
+    int[]             addGroupsCatDataToDB(int idUser,
+                                           int[] catData)        throws RemoteException, SQLException;
 }

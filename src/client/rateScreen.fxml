@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"  fx:controller="client.RateScreenFXMLController" prefHeight="230.0" prefWidth="350.0">
+    <Label styleClass="h1" layoutX="100.0" layoutY="20.0" fx:id="titleLabel" text=", оцените релевантность отображенного рекламного предложения" maxWidth="200.0" wrapText="true" textAlignment="CENTER"/>
+    <Label styleClass="h2" layoutX="30.0" layoutY="120.0" text="Оценка"/>
+    <ComboBox styleClass="combobox" layoutX="30.0" layoutY="140.0" fx:id="rateBox" prefWidth="120.0" prefHeight="20.0" visibleRowCount="4"  />
+    <Label styleClass="h2" layoutX="30.0" layoutY="170.0" text="Перейти на рекламу?"/>
+    <ComboBox styleClass="combobox" layoutX="30.0" layoutY="190.0" fx:id="clickBox" prefWidth="120.0" prefHeight="20.0" visibleRowCount="4"  />
+    <Button styleClass="butt" text="OK" fx:id="OKButt" onAction="#handleOKAction" prefHeight="20.0" prefWidth="35.0" layoutY="190.0" layoutX="275.0"/>
+</AnchorPane>

@@ -25,6 +25,7 @@ import java.rmi.registry.Registry;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,6 +35,7 @@ public class UserScreenFXMLController extends FXMLController implements Initiali
     //------------------------------------
 
     private FXMLController children;
+    private RateScreenFXMLController childrenRate;
     private FXMLController parent;
     private ArrayList<String> words;
     private Analysis analysisService;
@@ -43,6 +45,8 @@ public class UserScreenFXMLController extends FXMLController implements Initiali
     private boolean flagTest = false;
     private String url1="";
     private String url2="";
+    private int rate;
+    private boolean clickOnAd;
 
     @FXML
     TextArea textTA1;
@@ -98,6 +102,10 @@ public class UserScreenFXMLController extends FXMLController implements Initiali
         this.idUserDB = id;
     }
 
+    public void setRate(int rate){ this.rate = rate; }
+
+    public void setClickOnAd(boolean clickOnAd){ this.clickOnAd = clickOnAd; }
+
     //общая инициализация
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -138,7 +146,7 @@ public class UserScreenFXMLController extends FXMLController implements Initiali
     }
 
     //обработка нажатия на кнопку "Анализ"
-    public void handleSubmitButton(ActionEvent event) throws RemoteException, SQLException {
+    public void handleSubmitButton(ActionEvent event) throws IOException, SQLException, InterruptedException {
         //задание надписи имени пользователя
         nameUser.setText(analysisService.getNameUser(idUserDB));
         //задание начальных свойств
@@ -188,6 +196,11 @@ public class UserScreenFXMLController extends FXMLController implements Initiali
         System.out.println("\nРЕЛИГИЯ\n" + countWords[6] + " слов");
         System.out.println("\nМАРКЕТИНГ\n" + countWords[7] + " слов");
         System.out.println("\nМЕДИЦИНА\n" + countWords[8] + " слов");
+//------------------------------------тест--------------------------------------------------
+        //добавить в БД значения по кол-ву слов в каждой категории для группы
+        countWords = analysisService.addGroupsCatDataToDB(idUserDB, countWords);
+        //далее алгоритм не изменяем
+//------------------------------------тест--------------------------------------------------
         //вычисление "главной" категории
         String category = analysisService.getMaxCat(countWords);
         result.setText(category);
@@ -199,8 +212,13 @@ public class UserScreenFXMLController extends FXMLController implements Initiali
         //вывод изображения КР
         ad.setImage(image);
         int adId = analysisService.getAdId(imagePath);
+        //оценка пользователя
+        showRateScreen();
+
+        //TODO: добавить оценку в рекламу и инкрементировать кол-во показов
         //запись истории
-        analysisService.writeHistory(idUserDB, adId, url1, url2);
+        analysisService.writeHistory(idUserDB, adId, url1, url2, rate, clickOnAd);
+
     }
 
     //обработка нажатия на кнопку "+"
@@ -285,4 +303,24 @@ public class UserScreenFXMLController extends FXMLController implements Initiali
         helpStage.setTitle("Справочная информация");
         helpStage.show();
     }
+
+    //
+    private void showRateScreen() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("rateScreen.fxml"));
+
+        Parent root = loader.load();
+        Scene scene = new Scene(root);
+        scene.getStylesheets().add("client/style.css");
+        Stage rateStage = new Stage();
+        rateStage.setScene(scene);
+        rateStage.setTitle("Оценка рекламного предложения");
+
+        childrenRate = loader.getController();
+        childrenRate.setParent(this);
+        childrenRate.setNameUser(nameUser.getText());
+
+        rateStage.showAndWait();
+    }
+
+
 }

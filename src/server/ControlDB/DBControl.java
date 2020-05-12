@@ -4,6 +4,7 @@ import client.model.Ad;
 import client.model.Category;
 import client.model.History;
 import client.model.Word;
+import org.postgresql.core.SqlCommand;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -30,8 +31,10 @@ public interface DBControl extends Remote {
     ResultSet           getAuthUserId(String type,
                                       String userName,
                                       String password)    throws RemoteException, SQLException;
-    //получение ID группы пользователя
-    ResultSet           getUserGroupId(String group)      throws RemoteException, SQLException;
+    //получение ID группы пользователя по названию
+    ResultSet           getUserGroupIDByName(String group) throws RemoteException, SQLException;
+    //получение ID группы пользователя по ID пользователя
+    int                 getUserGroupIDByUser(int userID)   throws RemoteException, SQLException;
     //получение ID типа пользователя
     ResultSet           getUserTypeId(String type)        throws RemoteException, SQLException;
     //получение слова
@@ -49,6 +52,9 @@ public interface DBControl extends Remote {
     ResultSet           getURLFromBrowser() throws RemoteException, SQLException;
     //получение lowerTerm из файла истории браузера
     ResultSet           getLowerTermFromBrowser(int id)   throws  RemoteException, SQLException;
+    //получение групповой информации для пользователя по категории
+    int                 getGrpCatData(int userID,
+                                      int catID)          throws RemoteException, SQLException;
     //добавить категорию
     void                addCategory(String name)          throws RemoteException;
     //добавить слово
@@ -58,6 +64,10 @@ public interface DBControl extends Remote {
     void                addAd (String path,
                                int priority,
                                String catName)            throws RemoteException;
+    //добавить групповую информацию для пользователя по категории
+    void                addGrpCatData(int userID,
+                                      int catID,
+                                      int cnt)            throws RemoteException, SQLException;
     //добавление регистрирующегося пользователя
     void                insertRegUser(int typeId,
                                       int groupId,
@@ -68,7 +78,9 @@ public interface DBControl extends Remote {
     void                insertHistory(int userId,
                                       int adId,
                                       String url1,
-                                      String url2)        throws RemoteException, SQLException;
+                                      String url2,
+                                      int rate,
+                                      boolean click)      throws RemoteException, SQLException;
     //удалить категорию
     void                deleteCategory(int id)            throws RemoteException;
     //удалить слово
