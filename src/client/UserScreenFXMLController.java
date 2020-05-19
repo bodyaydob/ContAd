@@ -98,8 +98,10 @@ public class UserScreenFXMLController extends FXMLController implements Initiali
     }
 
     @Override
-    public void setId(int id) {
+    public void setId(int id) throws RemoteException {
         this.idUserDB = id;
+        //задание надписи имени пользователя
+        nameUser.setText(analysisService.getNameUser(idUserDB));
     }
 
     public void setRate(int rate){ this.rate = rate; }
@@ -147,8 +149,6 @@ public class UserScreenFXMLController extends FXMLController implements Initiali
 
     //обработка нажатия на кнопку "Анализ"
     public void handleSubmitButton(ActionEvent event) throws IOException, SQLException, InterruptedException {
-        //задание надписи имени пользователя
-        nameUser.setText(analysisService.getNameUser(idUserDB));
         //задание начальных свойств
         retryButt.setDisable(false);
         analysisButt.setDisable(true);
@@ -196,11 +196,9 @@ public class UserScreenFXMLController extends FXMLController implements Initiali
         System.out.println("\nРЕЛИГИЯ\n" + countWords[6] + " слов");
         System.out.println("\nМАРКЕТИНГ\n" + countWords[7] + " слов");
         System.out.println("\nМЕДИЦИНА\n" + countWords[8] + " слов");
-//------------------------------------тест--------------------------------------------------
+
         //добавить в БД значения по кол-ву слов в каждой категории для группы
         countWords = analysisService.addGroupsCatDataToDB(idUserDB, countWords);
-        //далее алгоритм не изменяем
-//------------------------------------тест--------------------------------------------------
         //вычисление "главной" категории
         String category = analysisService.getMaxCat(countWords);
         result.setText(category);

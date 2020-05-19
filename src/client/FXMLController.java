@@ -1,5 +1,7 @@
 package client;
 
+import java.rmi.RemoteException;
+
 public class FXMLController {
     private FXMLController children;
     private FXMLController parent;
@@ -16,7 +18,7 @@ public class FXMLController {
     }
 
 
-    public void setId(int id) {
+    public void setId(int id) throws RemoteException {
         this.id = id;
     }
 }

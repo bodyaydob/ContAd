@@ -158,10 +158,6 @@ public class AdminScreenFXMLController extends FXMLController implements Initial
     }
 
     public void handleChoiceBoxAction(ActionEvent event) throws RemoteException {
-        if (firstAction) {
-            nameUser.setText(DBConstrolService.getNameUser(idUserDB));
-            firstAction = false;
-        }
         if (choice.getValue().equals("...Хочу подумать...")) {
             addToggleBut.setVisible(false);
             delToggleBut.setVisible(false);
@@ -189,13 +185,12 @@ public class AdminScreenFXMLController extends FXMLController implements Initial
                 drawField();
             }
         }
-
-
     }
 
     @Override
-    public void setId(int id) {
+    public void setId(int id) throws RemoteException {
         this.idUserDB = id;
+        nameUser.setText(DBConstrolService.getNameUser(idUserDB));
     }
 
     public void handleLogoutAction(ActionEvent event) throws IOException {

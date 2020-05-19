@@ -5,10 +5,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.apache.lucene.morphology.russian.RussianMorphology;
-
-import java.sql.*;
-import java.util.List;
 
 public class ContextualAd extends Application {
     public static Stage primaryStage;
