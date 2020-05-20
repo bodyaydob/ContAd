@@ -39,12 +39,11 @@ public class UserScreenFXMLController extends FXMLController implements Initiali
     private FXMLController parent;
     private ArrayList<String> words;
     private Analysis analysisService;
-    private int countPages = 1;
+    private int countPages;
     private int idUserDB;
     private ToggleGroup tg = new ToggleGroup();
     private boolean flagTest = false;
-    private String url1="";
-    private String url2="";
+    private String[] urls;
     private int rate;
     private boolean clickOnAd;
 
@@ -63,9 +62,7 @@ public class UserScreenFXMLController extends FXMLController implements Initiali
     @FXML
     Button testButt;
     @FXML
-    ToggleButton onePageButt;
-    @FXML
-    ToggleButton twoPageButt;
+    Spinner<Integer> spinnerCntPages = new Spinner<>();
     @FXML
     Button retryButt;
     @FXML
@@ -129,11 +126,6 @@ public class UserScreenFXMLController extends FXMLController implements Initiali
 
     //инициализация узлов
     private void initNodes() {
-        //задание групп radiobutton
-        onePageButt.setToggleGroup(tg);
-        twoPageButt.setToggleGroup(tg);
-        onePageButt.setSelected(true);
-
         //задание видимости/активности узлов
         plusButt.setVisible(false);
         textTA1.setVisible(false);
@@ -142,9 +134,15 @@ public class UserScreenFXMLController extends FXMLController implements Initiali
 
         //инициализация спинера кол-ва стопслов
         int initStopWordsValue = 2;
-        SpinnerValueFactory<Integer> valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1,5, initStopWordsValue);
-        spinnerStopWord.setValueFactory(valueFactory);
+        SpinnerValueFactory<Integer> valueFactoryStoppWords = new SpinnerValueFactory.IntegerSpinnerValueFactory(1,5, initStopWordsValue);
+        spinnerStopWord.setValueFactory(valueFactoryStoppWords);
         spinnerStopWord.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
+
+        //инициализация спинера кол-ва стопслов
+        int initCntPagesValue = 2;
+        SpinnerValueFactory<Integer> valueFactoryCntPages = new SpinnerValueFactory.IntegerSpinnerValueFactory(1,10, initCntPagesValue);
+        spinnerCntPages.setValueFactory(valueFactoryCntPages);
+        spinnerCntPages.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
     }
 
     //обработка нажатия на кнопку "Анализ"
@@ -153,35 +151,31 @@ public class UserScreenFXMLController extends FXMLController implements Initiali
         retryButt.setDisable(false);
         analysisButt.setDisable(true);
         String text = null;
-        Document doc1 = null;
-        Document doc2 = null;
+        if (flagTest == false)
+            countPages = spinnerCntPages.getValue();
+        Document[] docs = new Document[countPages];
+        urls = new String[countPages];
+
         if (flagTest) {
             plusButt.setDisable(true);
-            url1 = textTA1.getText();
+            urls[0] = textTA1.getText();
             if (countPages == 2)
-                url2 = textTA2.getText();
+                urls[1] = textTA2.getText();
         }
-        else {
+        else
             //получение последних ссылок на веб-страницы
-            Object[] urls = analysisService.getURLS(2);
-            url1 = urls[1].toString();
-            if (countPages == 2)
-                url2 = urls[2].toString();
-        }
+            this.urls = analysisService.getURLS(countPages);
         try {
             //выгрузка содержимого веб-страниц
-            doc1 = Jsoup.connect(url1).get();
-            if (countPages == 2)
-                doc2 = Jsoup.connect(url2).get();
+            for(int i = 0; i<countPages; i++) {
+                docs[i] = Jsoup.connect(urls[i]).get();
+                //получение текста из выгруженных документов
+                text += docs[i].getElementsByTag("p").text() + ' ' + docs[i].getElementsByTag("h1").text() + ' ' + docs[i].getElementsByTag("h2").text();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //получение текста из выгруженных документов
-        if (doc1 != null) {
-            text = doc1.getElementsByTag("p").text() + ' ' + doc1.getElementsByTag("h1").text() + ' ' + doc1.getElementsByTag("h2").text();
-            if (countPages == 2)
-                text += "\n" + doc2.getElementsByTag("p").text() + ' ' + doc2.getElementsByTag("h1").text() + ' ' + doc2.getElementsByTag("h2").text();
-        }
+
         //парсинг полученного текста, получение списка лемм
         words = analysisService.getLemmas(text, spinnerStopWord.getValue());
         //получение кол-ва слов по категориям
@@ -212,10 +206,8 @@ public class UserScreenFXMLController extends FXMLController implements Initiali
         int adId = analysisService.getAdId(imagePath);
         //оценка пользователя
         showRateScreen();
-
-        //TODO: добавить оценку в рекламу и инкрементировать кол-во показов
         //запись истории
-        analysisService.writeHistory(idUserDB, adId, url1, url2, rate, clickOnAd);
+        analysisService.writeHistory(idUserDB, adId, urls, rate, clickOnAd);
 
     }
 
@@ -246,23 +238,13 @@ public class UserScreenFXMLController extends FXMLController implements Initiali
     //обработка нажатия на кнопку "Тест"
     public void handleTestButtonAction(ActionEvent event) {
         //отображение полей для ввода веб-страниц
-        onePageButt.setVisible(false);
-        twoPageButt.setVisible(false);
+        spinnerCntPages.setVisible(false);
         countPagesLabel.setVisible(false);
         testButt.setVisible(false);
         plusButt.setVisible(true);
         textTA1.setVisible(true);
         flagTest = true;
-    }
-
-    //обработка нажатия на кнопку "1" (1 обрабатываемая страница)
-    public void handleOnePageButtonAction(ActionEvent event) {
         countPages = 1;
-    }
-
-    //обработка нажатия на кнопку "2" (2 обрабатываемые страницы)
-    public void handleTwoPageButtonAction(ActionEvent event) {
-        countPages = 2;
     }
 
     //обработка нажатия на кнопку "Повторить"
@@ -273,8 +255,7 @@ public class UserScreenFXMLController extends FXMLController implements Initiali
         result.setText("Результат :");
         if(flagTest) {
             testButt.setVisible(true);
-            onePageButt.setVisible(true);
-            twoPageButt.setVisible(true);
+            spinnerCntPages.setVisible(true);
             countPagesLabel.setVisible(true);
             plusButt.setDisable(false);
             plusButt.setVisible(false);
@@ -284,10 +265,7 @@ public class UserScreenFXMLController extends FXMLController implements Initiali
             textTA2.setText("");
         }
         flagTest = false;
-        onePageButt.setSelected(true);
-        countPages = 1;
-        url1="";
-        url2="";
+        urls = null;
     }
 
     //обработка нажатия на кнопку "Помощь"

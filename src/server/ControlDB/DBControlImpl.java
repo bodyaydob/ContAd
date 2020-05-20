@@ -95,27 +95,47 @@ public class DBControlImpl implements DBControl {
     public ArrayList<History> getHistoryList() throws RemoteException {
         ResultSet resultSet = null;
         ArrayList<History> resultList = new ArrayList<History>();
+        String[] urlsString;
         try {
             Statement statement = connectPostgre.createStatement();
             resultSet = statement.executeQuery("SELECT id_history, " +
-                                                           "url, " +
+                                                           "urls, " +
+                                                           "rate, " +
+                                                           "click, " +
                                                            "username, " +
-                                                           "path " +
+                                                           "path, " +
+                                                           "user_group.name " +
                                                         "FROM history JOIN " +
                                                              "\"user\" ON history.id_user = \"user\".id_user JOIN " +
-                                                             "ad ON history.id_ad = ad.id_ad");
+                                                             "ad ON history.id_ad = ad.id_ad JOIN " +
+                                                             "user_group ON \"user\".id_usr_grp = user_group.id_group " +
+                                                        "ORDER BY history.id_history");
             while (resultSet.next()) {
-                Array urls = resultSet.getArray("url"); //TODO: 1. в БД скорректировать url
-                String[] urlsString = (String[]) urls.getArray();
-                int id = resultSet.getInt("id");
+                Array urls = resultSet.getArray("urls");
+                if (urls != null)
+                    urlsString = (String[]) urls.getArray();
+                else
+                    urlsString = new String[1];
+
+                int id = resultSet.getInt("id_history");
+
                 String user = resultSet.getString("username");
+
                 String ad = resultSet.getString("path");
-                String url1 = urlsString[0];
-                String url2 = urlsString[1];
-                History his = new History(id, user, ad, url1, url2);
+
+                int rate = resultSet.getInt("rate");
+
+                boolean click = resultSet.getBoolean("click");
+
+                String  userGroup = resultSet.getString("name");
+
+                History his = new History(id, user, userGroup, ad, urlsString, rate, click);
                 resultList.add(his);
             }
         } catch (SQLException e) {
+            Logger.getLogger(DBControlImpl.class.getName()).log(Level.SEVERE, null, e);
+        }
+        catch (Exception e){
             Logger.getLogger(DBControlImpl.class.getName()).log(Level.SEVERE, null, e);
         }
         return resultList;
@@ -284,15 +304,20 @@ public class DBControlImpl implements DBControl {
             resultSet = statement.executeQuery("SELECT id_ad, " +
                                                            "path, " +
                                                            "priority, " +
+                                                           "ad_rate, " +
+                                                           "displ_cnt, " +
                                                            "name " +
                                                         "FROM ad JOIN " +
-                                                             "category ON ad.id_cat = category.id_cat");
+                                                             "category ON ad.id_cat = category.id_cat " +
+                                                        "ORDER BY id_ad");
             while (resultSet.next()) {
                 int id = resultSet.getInt("id_ad");
                 String path = resultSet.getString("path");
                 int priority = resultSet.getInt("priority");
                 String cat = resultSet.getString("name");
-                Ad ad = new Ad(id, path,priority, cat);
+                int adRate = resultSet.getInt("ad_rate");
+                int displCnt = resultSet.getInt("displ_cnt");
+                Ad ad = new Ad(id, path, priority, cat, adRate, displCnt);
                 resultList.add(ad);
             }
         } catch (SQLException e) {
@@ -387,11 +412,19 @@ public class DBControlImpl implements DBControl {
 
     //добавление записи истории
     @Override
-    public void insertHistory(int userId, int adId, String url1, String url2, int rate, boolean click) throws RemoteException, SQLException {
+    public void insertHistory(int userId, int adId, String[] urls, int rate, boolean click) throws RemoteException, SQLException {
         Statement statement = connectPostgre.createStatement();
+        String urlsString = "";
         int grpId = getUserGroupIDByUser(userId);
-        statement.executeUpdate("INSERT INTO history (id_user, id_ad, url, id_usr_grp, rate, click) " +
-                                        "VALUES (" +userId + "," + adId + ",'{\"" + url1 + "\",\"" + url2 + "\"}'," + grpId + "," + rate + ", '" + click + "')");
+        urlsString = "{\"" + urls[0] + "\"";
+        for (int i = 1; i < urls.length; i++)
+            if (urls[i].length() > 30)
+                urlsString = urlsString + ", \"" + urls[i].substring(0,30) + "\"";
+            else
+                urlsString = urlsString + ", \"" + urls[i] + "\"";
+        urlsString += "}";
+        statement.executeUpdate("INSERT INTO history (id_user, id_ad, urls, id_usr_grp, rate, click) " +
+                                        "VALUES (" +userId + "," + adId + ",'" + urlsString + "'," + grpId + "," + rate + ", '" + click + "')");
     }
 
     //получение ID рекламного предлоежния
@@ -495,5 +528,31 @@ public class DBControlImpl implements DBControl {
                                         "ON CONFLICT (id_group, id_cat) " +
                                         "DO UPDATE " +
                                             "SET cnt_wrds = " + cnt);
+    }
+
+    //обновление исторических данных рекламы
+    @Override
+    public void updateAd(int adId, int rate) throws RemoteException, SQLException {
+        int adRate = 0;
+        int displCnt = 0;
+
+        Statement statement = connectPostgre.createStatement();
+        ResultSet resulSet = statement.executeQuery("SELECT ad_rate, " +
+                                                                "displ_cnt " +
+                                                            "FROM ad " +
+                                                            "WHERE id_ad = " + adId);
+
+        while (resulSet.next()) {
+            adRate = resulSet.getInt("ad_rate");
+            displCnt = resulSet.getInt("displ_cnt");
+        }
+
+        adRate += rate;
+        displCnt += 1;
+
+        statement.executeUpdate("UPDATE ad " +
+                                        "SET ad_rate = " + adRate + ", " +
+                                            "displ_cnt = " + displCnt + " " +
+                                        "WHERE id_ad = " + adId);
     }
 }

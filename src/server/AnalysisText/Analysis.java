@@ -11,7 +11,7 @@ public interface Analysis extends Remote {
     //-----------------------------------------
 
     //получение списка адресов посещенных веб-страниц
-    Object[]          getURLS(int count)                         throws RemoteException;
+    String[]          getURLS(int count)                         throws RemoteException;
     //получение списка лемм
     ArrayList<String> getLemmas(String text,
                                 int maxLengthStopWord)           throws RemoteException;
@@ -28,8 +28,7 @@ public interface Analysis extends Remote {
     //запись истории
     void              writeHistory (int userId,
                                     int adId,
-                                    String url1,
-                                    String url2,
+                                    String[] urls,
                                     int rate,
                                     boolean click)               throws RemoteException;
     //закрытие соединений с БД

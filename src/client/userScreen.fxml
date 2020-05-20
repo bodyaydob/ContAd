@@ -17,8 +17,7 @@
         <Button styleClass="butt" fx:id="plusButt" layoutX="10.0" layoutY="20.0" prefHeight="30.0" prefWidth="30.0" onAction="#handleAddButton" text="+"/>
         <Button text="Тест" fx:id="testButt" layoutX="10.0" layoutY="20.0" styleClass="butt" prefWidth="65.0" prefHeight="30.0" onAction="#handleTestButtonAction"/>
         <Label text="Кол-во анализируемых страниц" styleClass="h2" layoutX="95.0" layoutY="10.0" fx:id="countPagesLabel"/>
-        <ToggleButton onAction="#handleOnePageButtonAction" text="1" prefHeight="30.0" prefWidth="30.0" styleClass="butt" layoutY="30.0" layoutX="95.0" fx:id="onePageButt"/>
-        <ToggleButton onAction="#handleTwoPageButtonAction" text="2" prefHeight="30.0" prefWidth="30.0" styleClass="butt" layoutY="30.0" layoutX="135.0" fx:id="twoPageButt"/>
+        <Spinner fx:id="spinnerCntPages" layoutX="95.0" layoutY="30.0" styleClass="spinner" prefHeight="20.0" prefWidth="90.0" />
         <Button styleClass="butt" fx:id="analysisButt" layoutX="370.0" layoutY="20.0" prefWidth="90.0" prefHeight="20.0" onAction="#handleSubmitButton" text="Анализ"/>
         <Label styleClass="h1" fx:id="result" layoutY="100.0" layoutX="30.0" text="Результат :"/>
         <Button fx:id="retryButt" layoutX="430.0" layoutY="100.0" styleClass="retryButt" onAction="#handleRetryButton" prefWidth="30.0" prefHeight="30.0"/>

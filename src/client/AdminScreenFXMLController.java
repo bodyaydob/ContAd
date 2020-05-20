@@ -41,12 +41,13 @@ public class AdminScreenFXMLController extends FXMLController implements Initial
     private FXMLController parent;
     private int idUserDB;
     private DBControl DBConstrolService;
-    private boolean firstAction = true;
 
     TableColumn<History, String> userCol;
+    TableColumn<History, String> userGrpCol;
     TableColumn<History, String> adCol;
-    TableColumn<History, String> url1Col;
-    TableColumn<History, String> url2Col;
+    TableColumn<History, String> urlsCol;
+    TableColumn<History, String> rateCol;
+    TableColumn<History, String> clickCol;
 
     TableColumn<Category,String> nameCol;
 
@@ -56,6 +57,8 @@ public class AdminScreenFXMLController extends FXMLController implements Initial
     TableColumn<Ad,String> pathCol;
     TableColumn<Ad,Integer> prioCol;
     TableColumn<Ad,String> categCol;
+    TableColumn<Ad,String> avRateCol;
+    TableColumn<Ad,String> displCntCol;
 
 
     @FXML
@@ -117,9 +120,11 @@ public class AdminScreenFXMLController extends FXMLController implements Initial
         initNodes();
 
         userCol = new TableColumn<History, String>("Пользователь");
+        userGrpCol = new TableColumn<History, String>("Группа пользователя");
         adCol = new TableColumn<History, String>("Реклама");
-        url1Col = new TableColumn<History, String>("Запрос 1");
-        url2Col = new TableColumn<History, String>("Запрос 2");
+        urlsCol = new TableColumn<History, String>("Веб-запросы");
+        rateCol = new TableColumn<History, String>("Оценка");
+        clickCol = new TableColumn<History, String>("Переход на рекламу");
 
         nameCol = new TableColumn<Category,String>("Имя");
 
@@ -129,11 +134,15 @@ public class AdminScreenFXMLController extends FXMLController implements Initial
         pathCol = new TableColumn<Ad,String>("Путь к файлу");
         prioCol = new TableColumn<Ad,Integer>("Приоритет");
         categCol = new TableColumn<Ad,String>("Категория");
+        avRateCol = new TableColumn<Ad,String>("Средняя оценка");
+        displCntCol = new TableColumn<Ad,String>("Кол-во показов");
 
         userCol.setCellValueFactory(new PropertyValueFactory<>("user"));
+        userGrpCol.setCellValueFactory(new PropertyValueFactory<>("userGroup"));
         adCol.setCellValueFactory(new PropertyValueFactory<>("ad"));
-        url1Col.setCellValueFactory(new PropertyValueFactory<>("url1"));
-        url2Col.setCellValueFactory(new PropertyValueFactory<>("url2"));
+        urlsCol.setCellValueFactory(new PropertyValueFactory<>("urls"));
+        rateCol.setCellValueFactory(new PropertyValueFactory<>("rate"));
+        clickCol.setCellValueFactory(new PropertyValueFactory<>("click"));
 
         nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
 
@@ -143,7 +152,8 @@ public class AdminScreenFXMLController extends FXMLController implements Initial
         pathCol.setCellValueFactory(new PropertyValueFactory<>("path"));
         prioCol.setCellValueFactory(new PropertyValueFactory<>("priority"));
         categCol.setCellValueFactory(new PropertyValueFactory<>("category"));
-
+        avRateCol.setCellValueFactory(new PropertyValueFactory<>("avRate"));
+        displCntCol.setCellValueFactory(new PropertyValueFactory<>("displCnt"));
     }
 
     private void initNodes() {
@@ -171,7 +181,7 @@ public class AdminScreenFXMLController extends FXMLController implements Initial
                 delToggleBut.setVisible(false);
                 fields.setVisible(false);
                 delOKButt.setVisible(false);
-                table.getColumns().addAll(userCol, adCol, url1Col, url2Col);
+                table.getColumns().addAll(userCol, userGrpCol, adCol, urlsCol, rateCol, clickCol);
                 historyList = DBConstrolService.getHistoryList();
                 table.setItems(FXCollections.observableArrayList(historyList));
                 table.setVisible(true);
@@ -278,7 +288,7 @@ public class AdminScreenFXMLController extends FXMLController implements Initial
         delOKButt.setVisible(true);
         switch ((String) choice.getValue()) {
             case "Реклама":
-                table.getColumns().addAll(pathCol,prioCol,categCol);
+                table.getColumns().addAll(pathCol, prioCol, categCol, avRateCol, displCntCol);
                 adsList = DBConstrolService.getAdsList();
                 table.setItems(FXCollections.observableArrayList(adsList));
                 table.setVisible(true);

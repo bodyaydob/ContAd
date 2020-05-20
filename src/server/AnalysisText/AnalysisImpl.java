@@ -51,8 +51,6 @@ public class AnalysisImpl implements Analysis {
     @Override
     public int[] getCntCatsOfLemm(ArrayList<String> lemmas) throws RemoteException, SQLException {
         int[] result = new int[9];
-        /*for (int i : result)
-            i = 0;*/
         ResultSet resultRS = null;
         for (String lemma : lemmas) {
             resultRS = dbci.getWord(lemma);
@@ -139,10 +137,11 @@ public class AnalysisImpl implements Analysis {
 
     //запись истории
     @Override
-    public void writeHistory(int userId, int adId, String url1, String url2, int rate, boolean click) throws RemoteException {
+    public void writeHistory(int userId, int adId, String[] urls, int rate, boolean click) throws RemoteException {
         int idAd = 0;
         try {
-            dbci.insertHistory(userId, adId, url1, url2, rate, click);
+            dbci.insertHistory(userId, adId, urls, rate, click);
+            dbci.updateAd(adId, rate);
         }
         catch (SQLException e) {
             Logger.getLogger(AuthorizationImpl.class.getName()).log(Level.SEVERE, null, e);
@@ -166,74 +165,28 @@ public class AnalysisImpl implements Analysis {
 
     //получение списка адресов посещенных веб-страниц
     @Override
-    public Object[] getURLS(int count) throws RemoteException {
-        Object[] result = new Object[3];
-        result[0] = count;
-        ResultSet resultSet1 = null;
-        ResultSet resultSet2 = null;
-        String URL1 = "";
-        String URL2 = "";
-        String key1 = "";
-        String key2 = "";
-        int id1 = 0,
-            id2 = 0;
-
-        try
-        {
-            resultSet1 = dbci.getURLFromBrowser();
-
-            while (resultSet1.next ())
-            {
-                result[1] = resultSet1.getString("url");
-                result[1] += " ";
-                id1 = resultSet1.getInt("id");
-            }
-//            try{
-//                resultSet1 = dbci.getLowerTermFromBrowser(id1);
-//                while (resultSet1.next()){
-//                    result[1] += resultSet1.getString("lower_term");
-//                }
-//            }
-//            catch (Exception e){
-//                e.printStackTrace();
-//            }
-            System.out.println(result[1]);
-            dbci.deleteBrowserHistory(id1);
-            if(count == 2) {
-                resultSet2 = dbci.getURLFromBrowser();
-
-                while (resultSet2.next()) {
-                    result[2] = resultSet2.getString("url");
-                    result[2] +=" ";
-                    id2 = resultSet2.getInt("id");
+    public String[] getURLS(int count) throws RemoteException {
+        String[] result = new String[count];
+        ResultSet resultSet = null;
+        int id = 0;
+        try {
+            for(int i = 0; i < count; i++){
+                resultSet = dbci.getURLFromBrowser();
+                while (resultSet.next ()){
+                    result[i] = resultSet.getString("url") + " ";
+                    id = resultSet.getInt("id");
                 }
-//                try {
-//                    resultSet2 = dbci.getLowerTermFromBrowser(id2);
-//                    while (resultSet2.next()) {
-//                        result[2] += resultSet2.getString("lower_term");
-//                    }
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-                System.out.println(result[2]);
+                System.out.println(result[i]);
+                dbci.deleteBrowserHistory(id);
             }
-        }
-
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace ();
         }
 
-        finally
-        {
-            try
-            {
-                resultSet1.close ();
-                resultSet2.close ();
-            }
-
-            catch (Exception e)
-            {
+        finally {
+            try {
+                resultSet.close ();
+            } catch (Exception e) {
                 e.printStackTrace ();
             }
         }

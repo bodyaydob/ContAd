@@ -77,10 +77,12 @@ public interface DBControl extends Remote {
     //добавление записи истории
     void                insertHistory(int userId,
                                       int adId,
-                                      String url1,
-                                      String url2,
+                                      String[] urls,
                                       int rate,
                                       boolean click)      throws RemoteException, SQLException;
+    //обновление исторических данных рекламы
+    void                updateAd(int adId,
+                                 int rate)                throws RemoteException, SQLException;
     //удалить категорию
     void                deleteCategory(int id)            throws RemoteException;
     //удалить слово
