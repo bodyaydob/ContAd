@@ -35,7 +35,7 @@
                 <Label styleClass="h2" fx:id="lbfield1" GridPane.rowIndex="1"/>
                 <TextField styleClass="tf" fx:id="field1" prefHeight="30.0" prefWidth="200.0" GridPane.rowIndex="2"/>
                 <Label  styleClass="h2" fx:id="lbfield2" GridPane.rowIndex="3"/>
-                <ChoiceBox styleClass="tf" fx:id="field2" prefHeight="30.0" prefWidth="200.0" GridPane.rowIndex="4"/>
+                <ChoiceBox styleClass="tf" fx:id="field2" prefHeight="30.0" prefWidth="200.0" GridPane.rowIndex="4" onAction="#handleChoiceFieldAction"/>
                 <Label styleClass="h2" fx:id="lbfield3" GridPane.rowIndex="5"/>
                 <TextField styleClass="tf" fx:id="field3" prefHeight="30.0" prefWidth="200.0" GridPane.rowIndex="6"/>
             </children>

@@ -15,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
+import org.sqlite.core.DB;
 import server.ControlDB.DBControl;
 
 import java.io.IOException;
@@ -41,6 +42,7 @@ public class AdminScreenFXMLController extends FXMLController implements Initial
     private FXMLController parent;
     private int idUserDB;
     private DBControl DBConstrolService;
+    private String oldUserGroup;
 
     TableColumn<History, String> userCol;
     TableColumn<History, String> userGrpCol;
@@ -157,7 +159,7 @@ public class AdminScreenFXMLController extends FXMLController implements Initial
     }
 
     private void initNodes() {
-        choiceList = FXCollections.observableArrayList("...Хочу подумать...", "Реклама", "Словарь лемм", "Категории", "История");
+        choiceList = FXCollections.observableArrayList("...Хочу подумать...", "Реклама", "Словарь лемм", "Категории", "История", "Пользователи");
         choice.setItems(choiceList);
         tg = new ToggleGroup();
         addToggleBut.setToggleGroup(tg);
@@ -186,7 +188,15 @@ public class AdminScreenFXMLController extends FXMLController implements Initial
                 table.setItems(FXCollections.observableArrayList(historyList));
                 table.setVisible(true);
 
-            } else {
+            }
+            else if (choice.getValue().equals("Пользователи")){
+                addToggleBut.setVisible(false);
+                delToggleBut.setVisible(false);
+                table.setVisible(false);
+                delOKButt.setVisible(false);
+                drawField();
+            }
+            else {
                 addToggleBut.setVisible(true);
                 delToggleBut.setVisible(true);
                 addToggleBut.setSelected(true);
@@ -268,6 +278,20 @@ public class AdminScreenFXMLController extends FXMLController implements Initial
                 field3.setText("");
                 field2.setItems(FXCollections.observableArrayList(DBConstrolService.getCategoriesNameList()));
                 break;
+            case "Пользователи":
+                lbfield1.setVisible(true);
+                lbfield2.setVisible(true);
+                lbfield3.setVisible(false);
+                lbfield1.setText("Группа пользователей");
+                lbfield2.setText("Пользователь");
+                lbfield3.setText("");
+                field1.setVisible(true);
+                field2.setVisible(true);
+                field3.setVisible(false);
+                field1.setText("");
+                field3.setText("");
+                field2.setItems(FXCollections.observableArrayList(DBConstrolService.getUsernameList()));
+                break;
             default:
                 lbfield1.setVisible(false);
                 lbfield2.setVisible(false);
@@ -311,7 +335,7 @@ public class AdminScreenFXMLController extends FXMLController implements Initial
         }
     }
 
-    public void handleAddOKAction(ActionEvent event) throws RemoteException{
+    public void handleAddOKAction(ActionEvent event) throws RemoteException, SQLException {
         switch ((String) choice.getValue()) {
             case "Реклама":
                 DBConstrolService.addAd(field1.getText(),Integer.parseInt(field3.getText()), field2.getValue());
@@ -326,6 +350,9 @@ public class AdminScreenFXMLController extends FXMLController implements Initial
                 DBConstrolService.addWord(field1.getText(),field2.getValue());
                 field1.setText("");
                 break;
+            case "Пользователи":
+                if (oldUserGroup != field1.getText())
+                    DBConstrolService.updateUserGroup(field2.getValue(), field1.getText());
             default:
 
                 break;
@@ -356,5 +383,10 @@ public class AdminScreenFXMLController extends FXMLController implements Initial
 
                 break;
         }
+    }
+
+    public void handleChoiceFieldAction(ActionEvent actionEvent) throws RemoteException, SQLException {
+        oldUserGroup = field1.getText();
+        field1.setText(DBConstrolService.getUserGroupNameByUsername(field2.getValue()));
     }
 }

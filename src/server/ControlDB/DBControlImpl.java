@@ -367,10 +367,20 @@ public class DBControlImpl implements DBControl {
     //получение ID группы пользователя
     @Override
     public ResultSet getUserGroupIDByName(String group) throws RemoteException, SQLException {
-        Statement statement = connectPostgre.createStatement();
-        return statement.executeQuery("SELECT id_group " +
-                                            "FROM user_group " +
-                                            "WHERE name = '" + group + "'");
+        Statement statement = connectPostgre.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+        ResultSet resultSet = statement.executeQuery("SELECT id_group " +
+                                                            "FROM user_group " +
+                                                            "WHERE name = '" + group + "'");
+        if(resultSet.next() == false){
+            statement.executeUpdate("INSERT INTO user_group (name) " +
+                                            "VALUES ('" + group +"')");
+            resultSet  = statement.executeQuery("SELECT id_group " +
+                                                        "FROM user_group " +
+                                                        "WHERE name = '" + group + "'");
+        }
+        else
+            resultSet.beforeFirst();
+        return resultSet;
     }
 
     //получение ID типа пользователя
@@ -555,4 +565,55 @@ public class DBControlImpl implements DBControl {
                                             "displ_cnt = " + displCnt + " " +
                                         "WHERE id_ad = " + adId);
     }
+
+    //получение логинов пользователей
+
+    @Override
+    public ArrayList<String> getUsernameList() throws RemoteException {
+        ResultSet resultSet = null;
+        ArrayList<String> resultList = new ArrayList<String>();
+        try {
+            Statement statement = connectPostgre.createStatement();
+            //Выполним запрос
+            resultSet = statement.executeQuery("SELECT username " +
+                                                        "FROM \"user\" " +
+                                                        "WHERE id_usr_type = " + 1);
+            while (resultSet.next())
+                resultList.add(resultSet.getString("username"));
+        } catch (SQLException e) {
+            Logger.getLogger(DBControlImpl.class.getName()).log(Level.SEVERE, null, e);
+        }
+        return resultList;
+    }
+
+    //получение имени группы пользователей по логину пользователя
+    @Override
+    public String getUserGroupNameByUsername(String enteredUsername) throws RemoteException, SQLException {
+        String usrGrp = "";
+        Statement statement = connectPostgre.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT user_group.name " +
+                                                            "FROM \"user\" JOIN " +
+                                                                  "user_group ON \"user\".id_usr_grp = user_group.id_group " +
+                                                            "WHERE \"user\".username = '" + enteredUsername + "'");
+        while (resultSet.next())
+            usrGrp = resultSet.getString("name");
+        return usrGrp;
+    }
+
+    //обновление группы пользователей пользователя
+    @Override
+    public void updateUserGroup(String username, String groupName) throws RemoteException, SQLException {
+
+        int groupID = 0;
+        ResultSet groupIDRS = getUserGroupIDByName(groupName);
+        while (groupIDRS.next()){
+            groupID = groupIDRS.getInt("id_group");
+        }
+
+        Statement statement = connectPostgre.createStatement();
+        statement.executeUpdate("UPDATE \"user\" " +
+                                        "SET id_usr_grp = " + groupID + " " +
+                                        "WHERE username = '" + username + "'");
+    }
+
 }

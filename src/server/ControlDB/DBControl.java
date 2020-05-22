@@ -27,6 +27,12 @@ public interface DBControl extends Remote {
     ArrayList<String>   getCategoriesNameList()           throws RemoteException;
     //получение списка категорий
     ArrayList<Category> getCategoriesList()               throws RemoteException;
+    //получение списка слов
+    ArrayList<Word>     getWordsList()                    throws RemoteException;
+    //получение списка рекламных предложений
+    ArrayList<Ad>       getAdsList()                      throws RemoteException;
+    //получение списка логинов пользователей
+    ArrayList<String> getUsernameList()                   throws  RemoteException;
     //получение ID авторизующегося пользователя
     ResultSet           getAuthUserId(String type,
                                       String userName,
@@ -35,6 +41,8 @@ public interface DBControl extends Remote {
     ResultSet           getUserGroupIDByName(String group) throws RemoteException, SQLException;
     //получение ID группы пользователя по ID пользователя
     int                 getUserGroupIDByUser(int userID)   throws RemoteException, SQLException;
+    //получение имени группы пользователей по логину пользователя
+    String              getUserGroupNameByUsername(String username) throws RemoteException, SQLException;
     //получение ID типа пользователя
     ResultSet           getUserTypeId(String type)        throws RemoteException, SQLException;
     //получение слова
@@ -42,10 +50,6 @@ public interface DBControl extends Remote {
     //получение пути к рекламному предложению
     ResultSet           getPathAd(String catName,
                                   int priority)           throws RemoteException, SQLException;
-    //получение списка слов
-    ArrayList<Word>     getWordsList()                    throws RemoteException;
-    //получение списка рекламных предложений
-    ArrayList<Ad>       getAdsList()                      throws RemoteException;
     //получение ID рекламного предлоежния
     ResultSet           getAdId(String adPath)            throws RemoteException, SQLException;
     //получение URL из файла истории браузера
@@ -83,6 +87,9 @@ public interface DBControl extends Remote {
     //обновление исторических данных рекламы
     void                updateAd(int adId,
                                  int rate)                throws RemoteException, SQLException;
+    //обновление группы пользователей пользователя
+    void                updateUserGroup(String username,
+                                        String groupName) throws RemoteException, SQLException;
     //удалить категорию
     void                deleteCategory(int id)            throws RemoteException;
     //удалить слово
