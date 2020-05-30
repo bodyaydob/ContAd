@@ -6,17 +6,18 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane styleClass="pane" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="client.AdminScreenFXMLController" prefHeight="420.0" prefWidth="600.0">
+<AnchorPane styleClass="pane" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="client.AdminScreenFXMLController" prefHeight="550.0" prefWidth="785.0">
     <children>
         <Label styleClass="h1" layoutY="20.0" layoutX="30.0" text="Работать с ..."/>
         <ComboBox styleClass="combobox" layoutX="30.0" layoutY="50.0" fx:id="choice" prefWidth="170.0" prefHeight="20.0" onAction="#handleChoiceBoxAction"/>
-        <ToggleButton styleClass="butt" fx:id="addToggleBut" visible="false" prefHeight="25.0" prefWidth="100.0" layoutY="35.0" layoutX="230.0" text="Добавление" onAction="#handleAddAction"/>
-        <ToggleButton styleClass="butt" fx:id="delToggleBut" visible="false" prefHeight="25.0" prefWidth="100.0" layoutY="35.0" layoutX="345.0" text="Удаление" onAction="#handleDelAction"/>
-        <TableView styleClass="table" fx:id="table" layoutX="30.0" layoutY="110.0" visible="false" prefWidth="515.0" prefHeight="300.0"/>
-        <Label styleClass="h2" fx:id="nameUser" layoutX="480.0" layoutY="20.0" text="Тут должно быть имя"/>
-        <Button styleClass="butt" layoutX="480.0" layoutY="45.0" onAction="#handleLogoutAction" text="Выйти"/>
-        <Button styleClass="butt" text="OK" fx:id="delOKButt" onAction="#handleDelOKAction" prefHeight="20.0" prefWidth="35.0" layoutY="83.0" layoutX="30.0"/>
-        <GridPane layoutX="120.0" layoutY="90.0" fx:id="fields">
+        <ToggleButton styleClass="butt" fx:id="addToggleBut" visible="false" prefHeight="25.0" prefWidth="100.0" layoutY="35.0" layoutX="350.0" text="Добавление" onAction="#handleAddAction"/>
+        <ToggleButton styleClass="butt" fx:id="delToggleBut" visible="false" prefHeight="25.0" prefWidth="100.0" layoutY="35.0" layoutX="465.0" text="Удаление" onAction="#handleDelAction"/>
+        <TableView styleClass="table" fx:id="table" layoutX="30.0" layoutY="130.0" visible="false" prefWidth="755.0" prefHeight="400.0"/>
+        <TableView styleClass="table" fx:id="tablePerfInd" layoutX="30.0" layoutY="250.0" visible="false" prefWidth="755.0" prefHeight="280.0"/>
+        <Label styleClass="h2" fx:id="nameUser" layoutX="700.0" layoutY="20.0" text="Тут должно быть имя" />
+        <Button styleClass="butt" layoutX="700.0" layoutY="45.0" onAction="#handleLogoutAction" text="Выйти" />
+        <Button styleClass="butt" text="OK" fx:id="delOKButt" onAction="#handleDelOKAction" prefHeight="20.0" prefWidth="35.0" layoutY="90.0" layoutX="30.0"/>
+        <GridPane layoutX="30.0" layoutY="90.0" fx:id="fields">
             <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="200.0" prefWidth="250.0"/>
             </columnConstraints>
@@ -28,16 +29,16 @@
                 <RowConstraints vgrow="SOMETIMES" minHeight="25.0" prefHeight="35.0"/>
                 <RowConstraints vgrow="SOMETIMES" minHeight="25.0" prefHeight="35.0"/>
                 <RowConstraints vgrow="SOMETIMES" minHeight="25.0" prefHeight="35.0"/>
-                <RowConstraints vgrow="SOMETIMES" minHeight="25.0" prefHeight="35.0"/>
             </rowConstraints>
             <children>
-                <Button styleClass="butt" text="OK" onAction="#handleAddOKAction" prefHeight="20.0" prefWidth="35.0"/>
-                <Label styleClass="h2" fx:id="lbfield1" GridPane.rowIndex="1"/>
-                <TextField styleClass="tf" fx:id="field1" prefHeight="30.0" prefWidth="200.0" GridPane.rowIndex="2"/>
-                <Label  styleClass="h2" fx:id="lbfield2" GridPane.rowIndex="3"/>
-                <ChoiceBox styleClass="tf" fx:id="field2" prefHeight="30.0" prefWidth="200.0" GridPane.rowIndex="4" onAction="#handleChoiceFieldAction"/>
-                <Label styleClass="h2" fx:id="lbfield3" GridPane.rowIndex="5"/>
-                <TextField styleClass="tf" fx:id="field3" prefHeight="30.0" prefWidth="200.0" GridPane.rowIndex="6"/>
+                <Label styleClass="h2" fx:id="lbfield1" GridPane.rowIndex="0"/>
+                <TextField styleClass="tf" fx:id="field1" prefHeight="30.0" prefWidth="200.0" GridPane.rowIndex="1"/>
+                <ChoiceBox styleClass="tf" fx:id="field11" prefHeight="30.0" prefWidth="200.0" GridPane.rowIndex="1" onAction="#handleChoiceField11Action"/>
+                <Label  styleClass="h2" fx:id="lbfield2" GridPane.rowIndex="2"/>
+                <ChoiceBox styleClass="tf" fx:id="field2" prefHeight="30.0" prefWidth="200.0" GridPane.rowIndex="3" onAction="#handleChoiceField2Action"/>
+                <Label styleClass="h2" fx:id="lbfield3" GridPane.rowIndex="4"/>
+                <TextField styleClass="tf" fx:id="field3" prefHeight="30.0" prefWidth="200.0" GridPane.rowIndex="5"/>
+                <Button styleClass="butt" fx:id="addOKButt" text="OK" onAction="#handleAddOKAction" prefHeight="20.0" prefWidth="35.0" GridPane.rowIndex="7"/>
             </children>
         </GridPane>
     </children>

@@ -1,9 +1,6 @@
 package server.ControlDB;
 
-import client.model.Ad;
-import client.model.Category;
-import client.model.History;
-import client.model.Word;
+import client.model.*;
 
 import java.rmi.RemoteException;
 import java.sql.*;
@@ -161,9 +158,11 @@ public class DBControlImpl implements DBControl {
 
     //получение списка имен категорий
     @Override
-    public ArrayList<String> getCategoriesNameList() throws RemoteException {
+    public ArrayList<String> getCategoriesNameList(boolean firstEmpty) throws RemoteException {
         ResultSet resultSet = null;
         ArrayList<String> resultList = new ArrayList<String>();
+        if (firstEmpty)
+            resultList.add("");
         try {
             Statement statement = connectPostgre.createStatement();
             //Выполним запрос
@@ -616,4 +615,143 @@ public class DBControlImpl implements DBControl {
                                         "WHERE username = '" + username + "'");
     }
 
+    //получение списка показателя эффективности CTR
+    @Override
+    public ArrayList<CTR> getCTRList(String category) throws RemoteException {
+        ResultSet resultSet = null;
+        ArrayList<CTR> resultList = new ArrayList<CTR>();
+        String prePath = "";
+        String path = "";
+        int displCnt = 0,
+            click = 0;
+        try {
+            Statement statement = connectPostgre.createStatement();
+            //Выполним запрос
+            if (category == null ||
+                category.isEmpty())
+                resultSet = statement.executeQuery("SELECT path, " +
+                                                               "displ_cnt, " +
+                                                               "click " +
+                                                        "FROM ad JOIN " +
+                                                             "history ON ad.id_ad = history.id_ad " +
+                                                        "ORDER BY path");
+            else
+                resultSet = statement.executeQuery("SELECT path, " +
+                                                               "displ_cnt, " +
+                                                               "click " +
+                                                        "FROM ad JOIN " +
+                                                             "category ON ad.id_cat = category.id_cat JOIN " +
+                                                             "history ON ad.id_ad = history.id_ad " +
+                                                        "WHERE name = '" + category + "' " +
+                                                        "ORDER BY path");
+            while (resultSet.next()) {
+                if (prePath.equals(resultSet.getString("path"))){
+                    if (resultSet.getBoolean("click"))
+                        click += 1;
+                }
+                else{
+                    if(!resultSet.isFirst()){
+                        CTR CTR = new CTR(path, displCnt, click);
+                        resultList.add(CTR);
+                        click = 0;
+                    }
+                    path = resultSet.getString("path");
+                    displCnt = resultSet.getInt("displ_cnt");
+                    if (resultSet.getBoolean("click"))
+                        click += 1;
+                    prePath = path;
+                }
+            }
+            if (!path.isEmpty()) {
+                CTR CTR = new CTR(path, displCnt, click);
+                resultList.add(CTR);
+            }
+        } catch (SQLException e) {
+            Logger.getLogger(DBControlImpl.class.getName()).log(Level.SEVERE, null, e);
+        }
+        return resultList;
+    }
+
+    //получение списка показателя эффективности ППГП
+    @Override
+    public ArrayList<AssignUser2UserGroup> getAssignList(String group) throws RemoteException {
+        ResultSet resultSet = null;
+        ArrayList<AssignUser2UserGroup> resultList = new ArrayList<AssignUser2UserGroup>();
+        String preUsername = "";
+        String username = "";
+        String groupName = "";
+        int displCnt = 0,
+            sum_rate = 0;
+        try {
+            Statement statement = connectPostgre.createStatement();
+            //Выполним запрос
+            if (group == null ||
+                group.isEmpty())
+                resultSet = statement.executeQuery("SELECT username, " +
+                                                               "user_group.name, " +
+                                                               "rate " +
+                                                        "FROM \"user\"   JOIN " +
+                                                              "user_group ON  \"user\".id_usr_grp = user_group.id_group JOIN " +
+                                                              "history   ON \"user\".id_user = history.id_user " +
+                                                        "ORDER BY username");
+            else
+                resultSet = statement.executeQuery("SELECT username, " +
+                                                               "user_group.name, " +
+                                                               "rate " +
+                                                        "FROM \"user\"   JOIN " +
+                                                              "user_group ON  \"user\".id_usr_grp = user_group.id_group JOIN " +
+                                                              "history   ON \"user\".id_user = history.id_user " +
+                                                        "WHERE user_group.name = '" + group + "' " +
+                                                        "ORDER BY username");
+            while (resultSet.next()) {
+                if (preUsername.equals(resultSet.getString("username"))){
+                    if (resultSet.getInt("rate") > 0) {
+                        sum_rate += resultSet.getInt("rate");
+                        displCnt += 1;
+                    }
+                }
+                else{
+                    if(!resultSet.isFirst()){
+                        AssignUser2UserGroup assignInd = new AssignUser2UserGroup(username, groupName, sum_rate, displCnt);
+                        resultList.add(assignInd);
+                        sum_rate = displCnt = 0;
+                    }
+                    username = resultSet.getString("username");
+                    groupName = resultSet.getString("name");
+                    if (resultSet.getInt("rate") > 0) {
+                        sum_rate += resultSet.getInt("rate");
+                        displCnt += 1;
+                    }
+                    preUsername = username;
+                }
+            }
+            if (!username.isEmpty()) {
+                AssignUser2UserGroup assignInd = new AssignUser2UserGroup(username, groupName, sum_rate, displCnt);
+                resultList.add(assignInd);
+            }
+        } catch (SQLException e) {
+            Logger.getLogger(DBControlImpl.class.getName()).log(Level.SEVERE, null, e);
+        }
+        return resultList;
+    }
+
+    @Override
+    public ArrayList<String> getUserGroupNameList() throws RemoteException {
+        ResultSet resultSet = null;
+        ArrayList<String> resultList = new ArrayList<String>();
+        resultList.add("");
+        try {
+            Statement statement = connectPostgre.createStatement();
+            //Выполним запрос
+            resultSet = statement.executeQuery("SELECT DISTINCT user_group.name " +
+                                                    "FROM user_group JOIN " +
+                                                         "\"user\" ON user_group.id_group = \"user\".id_usr_grp " +
+                                                    "WHERE id_usr_type = " + 1);
+            while (resultSet.next())
+                resultList.add(resultSet.getString("name"));
+        } catch (SQLException e) {
+            Logger.getLogger(DBControlImpl.class.getName()).log(Level.SEVERE, null, e);
+        }
+        return resultList;
+    }
 }

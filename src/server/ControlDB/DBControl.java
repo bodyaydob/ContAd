@@ -1,9 +1,6 @@
 package server.ControlDB;
 
-import client.model.Ad;
-import client.model.Category;
-import client.model.History;
-import client.model.Word;
+import client.model.*;
 import org.postgresql.core.SqlCommand;
 
 import java.rmi.Remote;
@@ -24,7 +21,7 @@ public interface DBControl extends Remote {
     //получение имени пользователя
     String              getNameUser (int id)              throws RemoteException;
     //получение списка имен категорий
-    ArrayList<String>   getCategoriesNameList()           throws RemoteException;
+    ArrayList<String>   getCategoriesNameList(boolean firstEmpty) throws RemoteException;
     //получение списка категорий
     ArrayList<Category> getCategoriesList()               throws RemoteException;
     //получение списка слов
@@ -32,7 +29,13 @@ public interface DBControl extends Remote {
     //получение списка рекламных предложений
     ArrayList<Ad>       getAdsList()                      throws RemoteException;
     //получение списка логинов пользователей
-    ArrayList<String> getUsernameList()                   throws  RemoteException;
+    ArrayList<String>   getUsernameList()                 throws  RemoteException;
+    //получение списка показателя эффективности CTR
+    ArrayList<CTR>      getCTRList(String category)       throws RemoteException;
+    //получение списка показателя эффективности ППГП
+    ArrayList<AssignUser2UserGroup> getAssignList(String group) throws RemoteException;
+    //получение списка имен групп пользователей
+    ArrayList<String>   getUserGroupNameList()                  throws  RemoteException;
     //получение ID авторизующегося пользователя
     ResultSet           getAuthUserId(String type,
                                       String userName,
